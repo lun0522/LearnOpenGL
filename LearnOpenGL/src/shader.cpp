@@ -8,24 +8,26 @@
 
 #include "shader.h"
 
-std::string readCode(std::string path) {
-    std::string code;
-    std::stringstream stream;
-    std::ifstream file(path);
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+using std::string;
+
+string readCode(string path) {
+    using std::stringstream;
+    using std::ifstream;
+    
+    stringstream stream;
+    ifstream file(path);
+    file.exceptions(ifstream::failbit | ifstream::badbit);
+    if (!file.is_open()) throw "Cannot open file: " + path;
     
     try {
         stream << file.rdbuf();
-        code = stream.str();
-        file.close();
-    } catch (std::ifstream::failure e) {
+        return stream.str();
+    } catch (ifstream::failure e) {
         throw "Failed in reading file: " + e.code().message();
     }
-    
-    return code;
 }
 
-GLuint createShader(GLenum type, std::string source) {
+GLuint createShader(GLenum type, string source) {
     // .c_str() returns a r-value, should make it l-value and let it persist
     const char *srcString = source.c_str();
     GLuint shader = glCreateShader(type);
@@ -40,7 +42,7 @@ void validateShader(GLuint shader) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        throw std::string(infoLog);
+        throw string(infoLog);
     }
 }
 
@@ -58,32 +60,24 @@ void validateLink(GLuint program) {
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(program, 512, NULL, infoLog);
-        throw std::string(infoLog);
+        throw string(infoLog);
     }
 }
 
-Shader::Shader(std::string vertexPath, std::string fragmentPath) {
-    const char *vertexCode, *fragmentCode;
-    try {
-        vertexCode = readCode(vertexPath).c_str();
-        fragmentCode = readCode(fragmentPath).c_str();
-    } catch (std::string err) {
-        throw err;
-    }
-    
-    GLuint vertex = createShader(GL_VERTEX_SHADER, vertexCode);
-    GLuint fragment = createShader(GL_FRAGMENT_SHADER, fragmentCode);
+Shader::Shader(string &vertexPath, string &fragmentPath) {
+    GLuint vertex = createShader(GL_VERTEX_SHADER, readCode(vertexPath).c_str());
+    GLuint fragment = createShader(GL_FRAGMENT_SHADER, readCode(fragmentPath).c_str());
     try {
         validateShader(vertex);
         validateShader(fragment);
-    } catch (std::string log) {
+    } catch (string log) {
         throw "Failed in creating shader: " + log;
     }
     
     programId = createProgram(vertex, fragment);
     try {
         validateLink(programId);
-    } catch (std::string log) {
+    } catch (string log) {
         throw "Failed in linking: " + log;
     }
     glDeleteShader(vertex);
@@ -94,20 +88,20 @@ void Shader::use() {
     glUseProgram(programId);
 }
 
-void Shader::setBool(const std::string &name, bool value) const {
+GLuint Shader::getUniform(const string &name) const {
     GLint location = glad_glGetUniformLocation(programId, name.c_str());
-    if (location != -1) glUniform1i(location, (int)value);
-    else throw std::string("Cannot find uniform " + name);
+    if (location != -1) return location;
+    else throw string("Cannot find uniform " + name);
 }
 
-void Shader::setInt(const std::string &name, int value) const {
-    GLint location = glad_glGetUniformLocation(programId, name.c_str());
-    if (location != -1) glUniform1i(location, value);
-    else throw std::string("Cannot find uniform " + name);
+void Shader::setBool(const string &name, bool value) const {
+    glUniform1i(getUniform(name), (int)value);
 }
 
-void Shader::setFloat(const std::string &name, float value) const {
-    GLint location = glad_glGetUniformLocation(programId, name.c_str());
-    if (location != -1) glUniform1f(location, value);
-    else throw std::string("Cannot find uniform " + name);
+void Shader::setInt(const string &name, int value) const {
+    glUniform1i(getUniform(name), value);
+}
+
+void Shader::setFloat(const string &name, float value) const {
+    glUniform1f(getUniform(name), value);
 }

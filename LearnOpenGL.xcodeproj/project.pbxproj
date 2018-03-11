@@ -29,6 +29,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BD265CD52054A4FC00C13090 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stb_image.h; path = ../../stb_image.h; sourceTree = "<group>"; };
+		BD265CD72054A5DE00C13090 /* container.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = container.jpg; sourceTree = "<group>"; };
+		BD265CD82054C90700C13090 /* awesomeface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = awesomeface.png; sourceTree = "<group>"; };
 		BD4F031E2053076200758FD3 /* shader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shader.cpp; sourceTree = "<group>"; };
 		BD4F03202053077500758FD3 /* shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		BD7DDDA620505BC700DA8EFF /* LearnOpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LearnOpenGL; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,6 +59,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BD265CD62054A5C200C13090 /* texture */ = {
+			isa = PBXGroup;
+			children = (
+				BD265CD82054C90700C13090 /* awesomeface.png */,
+				BD265CD72054A5DE00C13090 /* container.jpg */,
+			);
+			path = texture;
+			sourceTree = "<group>";
+		};
 		BD7DDD9D20505BC600DA8EFF = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +108,7 @@
 		BD7DDDBD20506B0300DA8EFF /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BD265CD62054A5C200C13090 /* texture */,
 				BD849B602053AEA000393D9C /* shaders */,
 				BD7DDDBF20506B0300DA8EFF /* main.cpp */,
 				BD4F031E2053076200758FD3 /* shader.cpp */,
@@ -123,6 +136,7 @@
 		BDB101632053B34100B0516C /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				BD265CD52054A4FC00C13090 /* stb_image.h */,
 				BDB101642053B35200B0516C /* glad */,
 			);
 			name = lib;
