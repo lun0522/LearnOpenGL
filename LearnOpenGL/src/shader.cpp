@@ -105,3 +105,8 @@ void Shader::setInt(const string &name, int value) const {
 void Shader::setFloat(const string &name, float value) const {
     glUniform1f(getUniform(name), value);
 }
+
+void Shader::setMatrix(const std::string &name, GLfloat *value) const {
+    // how many matrices to send, transpose or not (GLM is already in coloumn order, so no)
+    glUniformMatrix4fv(getUniform(name), 1, GL_FALSE, value);
+}

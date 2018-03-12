@@ -12,7 +12,7 @@
 		BD4F031F2053076200758FD3 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD4F031E2053076200758FD3 /* shader.cpp */; };
 		BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB12050659D00DA8EFF /* OpenGL.framework */; };
 		BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD7DDDBF20506B0300DA8EFF /* main.cpp */; };
-		BDB1016C2053B35200B0516C /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BDB1016B2053B35200B0516C /* glad.c */; };
+		BDD021CA2055C41F0023401E /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BDD021C92055C41F0023401E /* glad.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,9 +29,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BD265CD52054A4FC00C13090 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stb_image.h; path = ../../stb_image.h; sourceTree = "<group>"; };
 		BD265CD72054A5DE00C13090 /* container.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = container.jpg; sourceTree = "<group>"; };
 		BD265CD82054C90700C13090 /* awesomeface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = awesomeface.png; sourceTree = "<group>"; };
+		BD3E65352055C1D700B22D12 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		BD3E65372055C1EF00B22D12 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		BD4F031E2053076200758FD3 /* shader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shader.cpp; sourceTree = "<group>"; };
 		BD4F03202053077500758FD3 /* shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		BD7DDDA620505BC700DA8EFF /* LearnOpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LearnOpenGL; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,9 +42,9 @@
 		BD7DDDBF20506B0300DA8EFF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		BD849B612053AEA000393D9C /* shader.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.vs; sourceTree = "<group>"; };
 		BD849B622053AEA000393D9C /* shader.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.fs; sourceTree = "<group>"; };
-		BDB101672053B35200B0516C /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
-		BDB101692053B35200B0516C /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
-		BDB1016B2053B35200B0516C /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
+		BDD021C52055C41F0023401E /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
+		BDD021C72055C41F0023401E /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
+		BDD021C92055C41F0023401E /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +60,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BD0F06102055C3BB003FD875 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				BDD021C22055C41F0023401E /* glad */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
 		BD265CD62054A5C200C13090 /* texture */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,7 +97,7 @@
 		BD7DDDA820505BC700DA8EFF /* LearnOpenGL */ = {
 			isa = PBXGroup;
 			children = (
-				BDB101632053B34100B0516C /* lib */,
+				BD0F06102055C3BB003FD875 /* lib */,
 				BD7DDDC020506B0300DA8EFF /* include */,
 				BD7DDDBD20506B0300DA8EFF /* src */,
 			);
@@ -98,6 +107,8 @@
 		BD7DDDB02050659D00DA8EFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BD3E65372055C1EF00B22D12 /* libstdc++.tbd */,
+				BD3E65352055C1D700B22D12 /* libc++.tbd */,
 				BD7DDDB6205068BE00DA8EFF /* libGLEW.2.1.0.dylib */,
 				BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */,
 				BD7DDDB12050659D00DA8EFF /* OpenGL.framework */,
@@ -133,54 +144,45 @@
 			path = shaders;
 			sourceTree = "<group>";
 		};
-		BDB101632053B34100B0516C /* lib */ = {
+		BDD021C22055C41F0023401E /* glad */ = {
 			isa = PBXGroup;
 			children = (
-				BD265CD52054A4FC00C13090 /* stb_image.h */,
-				BDB101642053B35200B0516C /* glad */,
-			);
-			name = lib;
-			sourceTree = "<group>";
-		};
-		BDB101642053B35200B0516C /* glad */ = {
-			isa = PBXGroup;
-			children = (
-				BDB101652053B35200B0516C /* include */,
-				BDB1016A2053B35200B0516C /* src */,
+				BDD021C32055C41F0023401E /* include */,
+				BDD021C82055C41F0023401E /* src */,
 			);
 			name = glad;
-			path = ../../glad;
+			path = ../../libs/glad;
 			sourceTree = "<group>";
 		};
-		BDB101652053B35200B0516C /* include */ = {
+		BDD021C32055C41F0023401E /* include */ = {
 			isa = PBXGroup;
 			children = (
-				BDB101662053B35200B0516C /* KHR */,
-				BDB101682053B35200B0516C /* glad */,
+				BDD021C42055C41F0023401E /* KHR */,
+				BDD021C62055C41F0023401E /* glad */,
 			);
 			path = include;
 			sourceTree = "<group>";
 		};
-		BDB101662053B35200B0516C /* KHR */ = {
+		BDD021C42055C41F0023401E /* KHR */ = {
 			isa = PBXGroup;
 			children = (
-				BDB101672053B35200B0516C /* khrplatform.h */,
+				BDD021C52055C41F0023401E /* khrplatform.h */,
 			);
 			path = KHR;
 			sourceTree = "<group>";
 		};
-		BDB101682053B35200B0516C /* glad */ = {
+		BDD021C62055C41F0023401E /* glad */ = {
 			isa = PBXGroup;
 			children = (
-				BDB101692053B35200B0516C /* glad.h */,
+				BDD021C72055C41F0023401E /* glad.h */,
 			);
 			path = glad;
 			sourceTree = "<group>";
 		};
-		BDB1016A2053B35200B0516C /* src */ = {
+		BDD021C82055C41F0023401E /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BDB1016B2053B35200B0516C /* glad.c */,
+				BDD021C92055C41F0023401E /* glad.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -244,7 +246,7 @@
 			files = (
 				BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */,
 				BD4F031F2053076200758FD3 /* shader.cpp in Sources */,
-				BDB1016C2053B35200B0516C /* glad.c in Sources */,
+				BDD021CA2055C41F0023401E /* glad.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +368,7 @@
 					/usr/local/Cellar/glew/2.1.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = /Users/lun/Desktop/Code/libs;
 			};
 			name = Debug;
 		};
@@ -381,6 +384,7 @@
 					/usr/local/Cellar/glew/2.1.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = /Users/lun/Desktop/Code/libs;
 			};
 			name = Release;
 		};

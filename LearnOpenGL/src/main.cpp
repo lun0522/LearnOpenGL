@@ -10,15 +10,16 @@
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
 
 using std::string;
 using std::endl;
 using std::cerr;
-
-float ratio = 0.7f;
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -27,11 +28,6 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        if (ratio > 0.1) ratio -= 0.01;
-    } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        if (ratio < 0.9) ratio += 0.01;
-    }
 }
 
 GLuint loadTexture(string path, GLenum format) {
@@ -96,15 +92,16 @@ int main(int argc, const char * argv[]) {
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
     string vPath = path + "shaders/shader.vs", fPath = path + "shaders/shader.fs";
-    Shader *shader;
+    Shader *vsShader;
     try {
         Shader tmp(vPath, fPath);
-        shader = &tmp;
+        vsShader = &tmp;
     } catch (string err) {
         cerr << err;
         glfwTerminate();
         return -1;
     }
+    Shader &shader = *vsShader;
     
     // ------------------------------------
     // VAO, VBO and EBO
@@ -112,20 +109,52 @@ int main(int argc, const char * argv[]) {
     // vertex array object, vertex buffer object, element buffer array
     // VAO stores attribute pointers (interpreted from VBO) and EBO (records any glBindBuffer call
     // with target GL_ELEMENT_ARRAY_BUFFER)
-    GLuint VAO, VBO, EBO;
+    GLuint VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // top left
-    };
-    GLuint indices[] = {
-        0, 1, 3,
-        1, 2, 3,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
     glGenBuffers(1, &VBO); // request 1 buffer object, and store in VBO (can pass an array)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -140,20 +169,25 @@ int main(int argc, const char * argv[]) {
     // whether e want the data to be normalized
     // space between consecutive vertex attribute sets (stride) (can set to be 0 if tightly packed)
     // offset of the position data begins in the buffer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0); // vertex attributes are disabled by default
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     glBindVertexArray(0); // do this before EBO unbinds! otherwise the unbinding is also recorded
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind EBO
+    
+    // ------------------------------------
+    // coordinates
+    
+    // object to world
+    glm::mat4 world = glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+    // world to view
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+    // clip to NDC
+    glfwGetFramebufferSize(window, &width, &height);
+    // field of view (usually 45), width : height, near plane, far plane
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
     
     // ------------------------------------
     // texture
@@ -173,27 +207,32 @@ int main(int argc, const char * argv[]) {
     // ------------------------------------
     // draw
     
+    glEnable(GL_DEPTH_TEST);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    
     // tell OpenGL which sampler corresponds to which texture
     // only have to do once
-    (*shader).use();
-    (*shader).setInt("texture1", 0);
-    (*shader).setInt("texture2", 1);
+    shader.use();
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
+    shader.setMatrix("view", glm::value_ptr(view));
+    shader.setMatrix("projection", glm::value_ptr(projection));
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
         processInput(window);
         
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        // use program, set uniforms, and draw
-        (*shader).use();
-        (*shader).setFloat("ratio", ratio);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        shader.use();
+        world = glm::rotate(world, glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+        shader.setMatrix("world", glm::value_ptr(world));
+        
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // how many indices to use, offset of array
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
         glfwSwapBuffers(window); // use color buffer to draw
         glfwPollEvents(); // check events (keyboard, mouse, ...)
