@@ -6,7 +6,6 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#include <glad/include/glad/glad.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>

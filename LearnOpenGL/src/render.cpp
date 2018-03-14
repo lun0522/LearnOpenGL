@@ -16,7 +16,10 @@
 
 using std::string;
 
-Camera camera(800, 600);
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastFrame = 0.0f;
 
 typedef struct ScreenSize {
@@ -50,13 +53,13 @@ void Render::processKeyboardInput() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera.processKeyboardInput(up, deltaTime);
+        camera.processKeyboardInput(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera.processKeyboardInput(down, deltaTime);
+        camera.processKeyboardInput(DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.processKeyboardInput(left, deltaTime);
+        camera.processKeyboardInput(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.processKeyboardInput(right, deltaTime);
+        camera.processKeyboardInput(RIGHT, deltaTime);
 }
 
 GLuint loadTexture(string path, GLenum format) {
@@ -87,12 +90,15 @@ Render::Render() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
+#ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
     
     // ------------------------------------
     // window
     
-    window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL) throw "Failed to create window";
     
     glfwMakeContextCurrent(window);
@@ -112,6 +118,7 @@ Render::Render() {
     // screen size is different from the input width and height on retina screen
     ScreenSize size = getScreenSize(window);
     glViewport(0, 0, size.width, size.height); // specify render area
+    camera.setScreenSize(size.width, size.height);
     
     // ------------------------------------
     // shader program

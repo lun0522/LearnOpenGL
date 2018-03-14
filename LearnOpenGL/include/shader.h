@@ -10,7 +10,7 @@
 #define shader_h
 
 #include <string>
-#include "glad.h"
+#include <glad/include/glad/glad.h>
 #include <GLFW/glfw3.h>
 
 class Shader {

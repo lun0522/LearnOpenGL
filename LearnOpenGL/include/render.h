@@ -9,6 +9,9 @@
 #ifndef render_h
 #define render_h
 
+#include <glad/include/glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "shader.h"
 #include "camera.h"
 

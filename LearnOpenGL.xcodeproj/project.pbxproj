@@ -14,7 +14,7 @@
 		BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD7DDDBF20506B0300DA8EFF /* main.cpp */; };
 		BD9252502058B89100F6779C /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cpp */; };
 		BD9252532058C76500F6779C /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cpp */; };
-		BDD021CA2055C41F0023401E /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BDD021C92055C41F0023401E /* glad.c */; };
+		BDA7AC8220598F6A0051122B /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BDA7AC8120598F6A0051122B /* glad.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,9 +48,9 @@
 		BD92524F2058B89100F6779C /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		BD9252512058C6A300F6779C /* render.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		BD9252522058C76500F6779C /* render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cpp; sourceTree = "<group>"; };
-		BDD021C52055C41F0023401E /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
-		BDD021C72055C41F0023401E /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
-		BDD021C92055C41F0023401E /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
+		BDA7AC7D20598F6A0051122B /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
+		BDA7AC7F20598F6A0051122B /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
+		BDA7AC8120598F6A0051122B /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,14 +66,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BD0F06102055C3BB003FD875 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				BDD021C22055C41F0023401E /* glad */,
-			);
-			name = lib;
-			sourceTree = "<group>";
-		};
 		BD265CD62054A5C200C13090 /* texture */ = {
 			isa = PBXGroup;
 			children = (
@@ -103,7 +95,7 @@
 		BD7DDDA820505BC700DA8EFF /* LearnOpenGL */ = {
 			isa = PBXGroup;
 			children = (
-				BD0F06102055C3BB003FD875 /* lib */,
+				BDA7AC7920598F560051122B /* lib */,
 				BD7DDDC020506B0300DA8EFF /* include */,
 				BD7DDDBD20506B0300DA8EFF /* src */,
 			);
@@ -154,45 +146,53 @@
 			path = shaders;
 			sourceTree = "<group>";
 		};
-		BDD021C22055C41F0023401E /* glad */ = {
+		BDA7AC7920598F560051122B /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				BDD021C32055C41F0023401E /* include */,
-				BDD021C82055C41F0023401E /* src */,
+				BDA7AC7A20598F6A0051122B /* glad */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+		BDA7AC7A20598F6A0051122B /* glad */ = {
+			isa = PBXGroup;
+			children = (
+				BDA7AC7B20598F6A0051122B /* include */,
+				BDA7AC8020598F6A0051122B /* src */,
 			);
 			name = glad;
 			path = ../../libs/glad;
 			sourceTree = "<group>";
 		};
-		BDD021C32055C41F0023401E /* include */ = {
+		BDA7AC7B20598F6A0051122B /* include */ = {
 			isa = PBXGroup;
 			children = (
-				BDD021C42055C41F0023401E /* KHR */,
-				BDD021C62055C41F0023401E /* glad */,
+				BDA7AC7C20598F6A0051122B /* KHR */,
+				BDA7AC7E20598F6A0051122B /* glad */,
 			);
 			path = include;
 			sourceTree = "<group>";
 		};
-		BDD021C42055C41F0023401E /* KHR */ = {
+		BDA7AC7C20598F6A0051122B /* KHR */ = {
 			isa = PBXGroup;
 			children = (
-				BDD021C52055C41F0023401E /* khrplatform.h */,
+				BDA7AC7D20598F6A0051122B /* khrplatform.h */,
 			);
 			path = KHR;
 			sourceTree = "<group>";
 		};
-		BDD021C62055C41F0023401E /* glad */ = {
+		BDA7AC7E20598F6A0051122B /* glad */ = {
 			isa = PBXGroup;
 			children = (
-				BDD021C72055C41F0023401E /* glad.h */,
+				BDA7AC7F20598F6A0051122B /* glad.h */,
 			);
 			path = glad;
 			sourceTree = "<group>";
 		};
-		BDD021C82055C41F0023401E /* src */ = {
+		BDA7AC8020598F6A0051122B /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BDD021C92055C41F0023401E /* glad.c */,
+				BDA7AC8120598F6A0051122B /* glad.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -254,10 +254,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDA7AC8220598F6A0051122B /* glad.c in Sources */,
 				BD9252502058B89100F6779C /* camera.cpp in Sources */,
 				BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */,
 				BD4F031F2053076200758FD3 /* shader.cpp in Sources */,
-				BDD021CA2055C41F0023401E /* glad.c in Sources */,
 				BD9252532058C76500F6779C /* render.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -371,6 +371,7 @@
 		BD7DDDAE20505BC700DA8EFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DXJ7AC4744;
 				HEADER_SEARCH_PATHS = /usr/local/include;
@@ -386,6 +387,7 @@
 		BD7DDDAF20505BC700DA8EFF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DXJ7AC4744;
 				HEADER_SEARCH_PATHS = /usr/local/include;

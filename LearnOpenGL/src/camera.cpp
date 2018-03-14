@@ -10,21 +10,25 @@
 
 #include "camera.h"
 
-Camera::Camera(int screenWidth, int screenHeight) {
+Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraFront, glm::vec3 cameraUp,
+               float cameraFov, float cameraYaw, float cameraPitch, float mouseSensitivity) {
+    position = cameraPosition;
+    front = cameraFront;
+    up = cameraUp;
+    right = glm::normalize(glm::cross(up, front));
+    updateViewMatrix();
+    fov = cameraFov;
+    yaw = cameraYaw;
+    pitch = cameraPitch;
+    sensitivity = mouseSensitivity;
     firstFrame = true;
-    fov = 45.0f;
+}
+
+void Camera::setScreenSize(int screenWidth, int screenHeight) {
     width = screenWidth;
     height = screenHeight;
-    yaw = -90.0f;
-    pitch = 0.0f;
     lastX = width / 2.0f;
     lastY = height / 2.0f;
-    mouseSensitivity = 0.05f;
-    cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    cameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
-    cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    updateViewMatrix();
     updateProjectionMatrix();
 }
 
@@ -35,43 +39,45 @@ void Camera::processMouseMove(double xPos, double yPos) {
         firstFrame = false;
     }
     
-    float xOffset = (xPos - lastX) * mouseSensitivity;
-    float yOffset = (yPos - lastY) * mouseSensitivity;
+    float xOffset = (xPos - lastX) * sensitivity;
+    float yOffset = (yPos - lastY) * sensitivity;
     lastX = xPos;
     lastY = yPos;
     
     yaw += xOffset;
+    if (yaw >= 360.0f) yaw -= 360.0f;
+    
     pitch -= yOffset;
     if (pitch > 89.0f) pitch = 89.0f;
     else if (pitch < -89.0f) pitch = -89.0f;
     
-    cameraFront = glm::vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
-                            sin(glm::radians(pitch)),
-                            cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
+    front = glm::vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
+                      sin(glm::radians(pitch)),
+                      cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
     updateViewMatrix();
 }
 
 void Camera::processMouseScroll(double yOffset) {
-    fov -= yOffset;
+    fov += yOffset;
     if (fov < 1.0f) fov = 1.0f;
     else if (fov > 45.0f) fov = 45.0f;
     updateProjectionMatrix();
 }
 
 void Camera::processKeyboardInput(CameraMoveDirection direction, float deltaTime) {
-    float cameraSpeed = deltaTime * 2.0f;
+    float speed = deltaTime * 2.0f;
     switch (direction) {
-        case up:
-            cameraPosition += cameraFront * cameraSpeed;
+        case UP:
+            position += front * speed;
             break;
-        case down:
-            cameraPosition -= cameraFront * cameraSpeed;
+        case DOWN:
+            position -= front * speed;
             break;
-        case left:
-            cameraPosition += cameraRight * cameraSpeed;
+        case LEFT:
+            position += right * speed;
             break;
-        case right:
-            cameraPosition -= cameraRight * cameraSpeed;
+        case RIGHT:
+            position -= right * speed;
             break;
         default:
             throw "Invalid direction";
@@ -80,17 +86,19 @@ void Camera::processKeyboardInput(CameraMoveDirection direction, float deltaTime
 }
 
 void Camera::updateViewMatrix() {
-    viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+    viewMatrix = glm::lookAt(position, position + front, up);
 }
 
-glm::mat4 Camera::getViewMatrix() {
+glm::mat4& Camera::getViewMatrix() {
     return viewMatrix;
 }
 
 void Camera::updateProjectionMatrix() {
+    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
     projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
 }
 
-glm::mat4 Camera::getProjectionMatrix() {
+glm::mat4& Camera::getProjectionMatrix() {
+    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
     return projectionMatrix;
 }
