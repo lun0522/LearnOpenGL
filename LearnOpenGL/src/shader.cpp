@@ -6,6 +6,11 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
+#include <glad/include/glad/glad.h>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 #include "shader.h"
 
 using std::string;
@@ -64,7 +69,7 @@ void validateLink(GLuint program) {
     }
 }
 
-Shader::Shader(string &vertexPath, string &fragmentPath) {
+void Shader::loadShader(string &vertexPath, string &fragmentPath) {
     GLuint vertex = createShader(GL_VERTEX_SHADER, readCode(vertexPath).c_str());
     GLuint fragment = createShader(GL_FRAGMENT_SHADER, readCode(fragmentPath).c_str());
     try {

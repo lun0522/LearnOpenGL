@@ -6,19 +6,17 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#ifndef Shader_h
-#define Shader_h
+#ifndef shader_h
+#define shader_h
 
-#include <glad/include/glad/glad.h>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include "glad.h"
+#include <GLFW/glfw3.h>
 
 class Shader {
 public:
     GLuint programId;
-    Shader(std::string &vertexPath, std::string &fragmentPath);
+    void loadShader(std::string &vertexPath, std::string &fragmentPath);
     void use();
     GLuint getUniform(const std::string &name) const;
     void setBool(const std::string &name, bool value) const;
