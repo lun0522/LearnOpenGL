@@ -18,6 +18,7 @@ class Camera {
     glm::mat4 viewMatrix, projectionMatrix;
     float fov, yaw, pitch, width, height, lastX, lastY, sensitivity;
     bool firstFrame;
+    void updateRight();
     void updateViewMatrix();
     void updateProjectionMatrix();
 public:

@@ -68,7 +68,7 @@ void validateLink(GLuint program) {
     }
 }
 
-void Shader::loadShader(string &vertexPath, string &fragmentPath) {
+Shader::Shader(string vertexPath, string fragmentPath) {
     GLuint vertex = createShader(GL_VERTEX_SHADER, readCode(vertexPath).c_str());
     GLuint fragment = createShader(GL_FRAGMENT_SHADER, readCode(fragmentPath).c_str());
     try {
@@ -108,6 +108,10 @@ void Shader::setInt(const string &name, int value) const {
 
 void Shader::setFloat(const string &name, float value) const {
     glUniform1f(getUniform(name), value);
+}
+
+void Shader::setVector(const std::string &name, GLfloat *value) const {
+    glUniform3fv(getUniform(name), 1, value);
 }
 
 void Shader::setMatrix(const std::string &name, GLfloat *value) const {

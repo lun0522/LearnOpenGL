@@ -17,13 +17,9 @@
 
 class Render {
     GLFWwindow *window;
-    Shader shader;
-    GLuint VAO, VBO;
-    glm::mat4 model;
     void processKeyboardInput();
 public:
     Render();
-    ~Render();
     void renderLoop();
 };
 

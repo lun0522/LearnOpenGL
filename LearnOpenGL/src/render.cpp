@@ -21,6 +21,7 @@ const int SCREEN_HEIGHT = 600;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastFrame = 0.0f;
+float intensity = 1.0f;
 
 typedef struct ScreenSize {
     int width;
@@ -50,8 +51,11 @@ void Render::processKeyboardInput() {
     float deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
     
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+        return;
+    }
+    
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         camera.processKeyboardInput(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -60,6 +64,14 @@ void Render::processKeyboardInput() {
         camera.processKeyboardInput(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         camera.processKeyboardInput(RIGHT, deltaTime);
+    
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+        intensity += 0.02f;
+        if (intensity > 1.0f) intensity = 1.0f;
+    } else if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+        intensity -= 0.02f;
+        if (intensity < 0.0f) intensity = 0.0f;
+    }
 }
 
 GLuint loadTexture(string path, GLenum format) {
@@ -119,22 +131,18 @@ Render::Render() {
     ScreenSize size = getScreenSize(window);
     glViewport(0, 0, size.width, size.height); // specify render area
     camera.setScreenSize(size.width, size.height);
-    
+}
+
+void Render::renderLoop() {
     // ------------------------------------
     // shader program
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
-    string vPath = path + "shaders/shader.vs", fPath = path + "shaders/shader.fs";
-    shader.loadShader(vPath, fPath);
+    Shader lightShader = Shader(path + "shaders/shader_light.vs", path + "shaders/shader_light.fs");
+    Shader rotatorShader = Shader(path + "shaders/shader_rotator.vs", path + "shaders/shader_rotator.fs");
     
     // ------------------------------------
     // VAO, VBO and EBO
-    
-    // vertex array object, vertex buffer object, element buffer array
-    // VAO stores attribute pointers (interpreted from VBO) and EBO (records any glBindBuffer call
-    // with target GL_ELEMENT_ARRAY_BUFFER)
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
     
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -179,6 +187,15 @@ Render::Render() {
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    
+    // vertex array object, vertex buffer object, element buffer array
+    // VAO stores attribute pointers (interpreted from VBO) and EBO (records any glBindBuffer call
+    // with target GL_ELEMENT_ARRAY_BUFFER)
+    GLuint rotatorVAO, lightVAO, VBO;
+    
+    glGenVertexArrays(1, &rotatorVAO);
+    glBindVertexArray(rotatorVAO);
+    
     glGenBuffers(1, &VBO); // request 1 buffer object, and store in VBO (can pass an array)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // GL_STATIC_DRAW: for data that does not change
@@ -197,6 +214,12 @@ Render::Render() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+    
     glBindVertexArray(0); // do this before EBO unbinds! otherwise the unbinding is also recorded
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
     
@@ -204,7 +227,10 @@ Render::Render() {
     // coordinates
     
     // object to world
-    model = glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+    glm::mat4 light = glm::mat4(1.0f);
+    light = glm::translate(light, glm::vec3(0.5f, 0.5f, 1.5f));
+    light = glm::scale(light, glm::vec3(0.2f));
+    glm::mat4 rotator = glm::mat4(1.0f);
     
     // ------------------------------------
     // texture
@@ -223,34 +249,46 @@ Render::Render() {
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, texture2);
     
-    shader.use();
-    shader.setInt("texture1", 0); // tell OpenGL which sampler corresponds to which texture
-    shader.setInt("texture2", 1);
-}
-
-Render::~Render() {
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
-}
-
-void Render::renderLoop() {
+    glm::vec3 lightColor = glm::vec3(1.0f);
+    glm::vec3 rotatorColor = glm::vec3(1.0f, 0.5f, 0.31f);
+    
+    lightShader.use();
+    lightShader.setVector("lightColor", glm::value_ptr(lightColor));
+    lightShader.setMatrix("model", glm::value_ptr(light));
+    
+    rotatorShader.use();
+    rotatorShader.setInt("texture1", 0); // tell OpenGL which sampler corresponds to which texture
+    rotatorShader.setInt("texture2", 1);
+    rotatorShader.setVector("lightColor", glm::value_ptr(lightColor));
+    rotatorShader.setVector("objectColor", glm::value_ptr(rotatorColor));
+    
     while (!glfwWindowShouldClose(window)) { // until user hit close
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         processKeyboardInput();
-        shader.use();
-        model = glm::rotate(model, glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+        
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix();
-        shader.setMatrix("model", glm::value_ptr(model));
-        shader.setMatrix("view", glm::value_ptr(view));
-        shader.setMatrix("projection", glm::value_ptr(projection));
         
-        glBindVertexArray(VAO);
+        lightShader.use();
+        lightShader.setFloat("lightIntensity", intensity);
+        lightShader.setMatrix("view", glm::value_ptr(view));
+        lightShader.setMatrix("projection", glm::value_ptr(projection));
+        glBindVertexArray(rotatorVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        rotatorShader.use();
+        rotator = glm::rotate(rotator, glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+        rotatorShader.setMatrix("model", glm::value_ptr(rotator));
+        rotatorShader.setMatrix("view", glm::value_ptr(view));
+        rotatorShader.setMatrix("projection", glm::value_ptr(projection));
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
         glfwSwapBuffers(window); // use color buffer to draw
         glfwPollEvents(); // check events (keyboard, mouse, ...)
     }
+    
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &rotatorVAO);
 }

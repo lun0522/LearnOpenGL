@@ -19,7 +19,7 @@ int main(int argc, const char * argv[]) {
         glfwTerminate();
         return 0;
     } catch (string err) {
-        std::cerr << err << std::endl;
+        std::cerr << "Error: " << err << std::endl;
         glfwTerminate();
         return -1;
     }

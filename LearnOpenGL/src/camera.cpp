@@ -10,12 +10,17 @@
 
 #include "camera.h"
 
-Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraFront, glm::vec3 cameraUp,
-               float cameraFov, float cameraYaw, float cameraPitch, float mouseSensitivity) {
+Camera::Camera(glm::vec3 cameraPosition,
+               glm::vec3 cameraFront,
+               glm::vec3 cameraUp,
+               float cameraFov,
+               float cameraYaw,
+               float cameraPitch,
+               float mouseSensitivity) {
     position = cameraPosition;
     front = cameraFront;
     up = cameraUp;
-    right = glm::normalize(glm::cross(up, front));
+    updateRight();
     updateViewMatrix();
     fov = cameraFov;
     yaw = cameraYaw;
@@ -54,13 +59,14 @@ void Camera::processMouseMove(double xPos, double yPos) {
     front = glm::vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
                       sin(glm::radians(pitch)),
                       cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
+    updateRight();
     updateViewMatrix();
 }
 
 void Camera::processMouseScroll(double yOffset) {
     fov += yOffset;
     if (fov < 1.0f) fov = 1.0f;
-    else if (fov > 45.0f) fov = 45.0f;
+    else if (fov > 60.0f) fov = 60.0f;
     updateProjectionMatrix();
 }
 
@@ -85,12 +91,17 @@ void Camera::processKeyboardInput(CameraMoveDirection direction, float deltaTime
     updateViewMatrix();
 }
 
-void Camera::updateViewMatrix() {
-    viewMatrix = glm::lookAt(position, position + front, up);
-}
-
 glm::mat4& Camera::getViewMatrix() {
     return viewMatrix;
+}
+
+glm::mat4& Camera::getProjectionMatrix() {
+    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
+    return projectionMatrix;
+}
+
+void Camera::updateRight() {
+    right = glm::normalize(glm::cross(front, up));
 }
 
 void Camera::updateProjectionMatrix() {
@@ -98,7 +109,6 @@ void Camera::updateProjectionMatrix() {
     projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
 }
 
-glm::mat4& Camera::getProjectionMatrix() {
-    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
-    return projectionMatrix;
+void Camera::updateViewMatrix() {
+    viewMatrix = glm::lookAt(position, position + front, up);
 }
