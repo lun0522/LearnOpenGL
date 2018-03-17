@@ -110,11 +110,15 @@ void Shader::setFloat(const string &name, float value) const {
     glUniform1f(getUniform(name), value);
 }
 
-void Shader::setVector(const std::string &name, GLfloat *value) const {
+void Shader::setVec3(const std::string &name, GLfloat *value) const {
     glUniform3fv(getUniform(name), 1, value);
 }
 
-void Shader::setMatrix(const std::string &name, GLfloat *value) const {
+void Shader::setMat3(const std::string &name, GLfloat *value) const {
     // how many matrices to send, transpose or not (GLM is already in coloumn order, so no)
+    glUniformMatrix3fv(getUniform(name), 1, GL_FALSE, value);
+}
+
+void Shader::setMat4(const std::string &name, GLfloat *value) const {
     glUniformMatrix4fv(getUniform(name), 1, GL_FALSE, value);
 }

@@ -22,6 +22,8 @@ const int SCREEN_HEIGHT = 600;
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastFrame = 0.0f;
 float intensity = 1.0f;
+float ambient = 0.1f;
+float specular = 0.8f;
 
 typedef struct ScreenSize {
     int width;
@@ -138,54 +140,56 @@ void Render::renderLoop() {
     // shader program
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
-    Shader lightShader = Shader(path + "shaders/shader_light.vs", path + "shaders/shader_light.fs");
-    Shader rotatorShader = Shader(path + "shaders/shader_rotator.vs", path + "shaders/shader_rotator.fs");
+    Shader lightShader = Shader(path + "shaders/shader_light.vs",
+                                path + "shaders/shader_light.fs");
+    Shader rotatorShader = Shader(path + "shaders/shader_rotator.vs",
+                                  path + "shaders/shader_rotator.fs");
     
     // ------------------------------------
     // VAO, VBO and EBO
     
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
         
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
         
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
         
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
         
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
         
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
     
     // vertex array object, vertex buffer object, element buffer array
@@ -203,21 +207,23 @@ void Render::renderLoop() {
     // GL_STREAM_DRAW: for data that changes every time when it is drawn
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // tell OpenGL how to interpret the vertex data
-    // which vertex attribute to configure (location = 0)
+    // which vertex attribute to configure (location)
     // size of vertex attribute
     // data type
     // whether e want the data to be normalized
     // space between consecutive vertex attribute sets (stride) (can set to be 0 if tightly packed)
     // offset of the position data begins in the buffer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0); // vertex attributes are disabled by default
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     
     glBindVertexArray(0); // do this before EBO unbinds! otherwise the unbinding is also recorded
@@ -228,7 +234,8 @@ void Render::renderLoop() {
     
     // object to world
     glm::mat4 light = glm::mat4(1.0f);
-    light = glm::translate(light, glm::vec3(0.5f, 0.5f, 1.5f));
+    glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 1.5f);
+    light = glm::translate(light, lightPos);
     light = glm::scale(light, glm::vec3(0.2f));
     glm::mat4 rotator = glm::mat4(1.0f);
     
@@ -250,17 +257,17 @@ void Render::renderLoop() {
     glBindTexture(GL_TEXTURE_2D, texture2);
     
     glm::vec3 lightColor = glm::vec3(1.0f);
-    glm::vec3 rotatorColor = glm::vec3(1.0f, 0.5f, 0.31f);
     
     lightShader.use();
-    lightShader.setVector("lightColor", glm::value_ptr(lightColor));
-    lightShader.setMatrix("model", glm::value_ptr(light));
+    lightShader.setVec3("lightColor", glm::value_ptr(lightColor));
+    lightShader.setMat4("model", glm::value_ptr(light));
     
     rotatorShader.use();
     rotatorShader.setInt("texture1", 0); // tell OpenGL which sampler corresponds to which texture
     rotatorShader.setInt("texture2", 1);
-    rotatorShader.setVector("lightColor", glm::value_ptr(lightColor));
-    rotatorShader.setVector("objectColor", glm::value_ptr(rotatorColor));
+    rotatorShader.setFloat("ambient", ambient);
+    rotatorShader.setFloat("specular", specular);
+    rotatorShader.setVec3("lightColor", glm::value_ptr(lightColor));
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -272,17 +279,22 @@ void Render::renderLoop() {
         glm::mat4 projection = camera.getProjectionMatrix();
         
         lightShader.use();
-        lightShader.setFloat("lightIntensity", intensity);
-        lightShader.setMatrix("view", glm::value_ptr(view));
-        lightShader.setMatrix("projection", glm::value_ptr(projection));
+        lightShader.setFloat("intensity", intensity);
+        lightShader.setMat4("view", glm::value_ptr(view));
+        lightShader.setMat4("projection", glm::value_ptr(projection));
         glBindVertexArray(rotatorVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
         rotatorShader.use();
-        rotator = glm::rotate(rotator, glm::radians(1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
-        rotatorShader.setMatrix("model", glm::value_ptr(rotator));
-        rotatorShader.setMatrix("view", glm::value_ptr(view));
-        rotatorShader.setMatrix("projection", glm::value_ptr(projection));
+        rotator = glm::rotate(rotator, glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::vec3 lightInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+        glm::mat3 normal = glm::transpose(glm::inverse(glm::mat3(view * rotator)));
+        rotatorShader.setFloat("intensity", intensity);
+        rotatorShader.setVec3("lightPos", glm::value_ptr(lightInView));
+        rotatorShader.setMat4("model", glm::value_ptr(rotator));
+        rotatorShader.setMat3("normal", glm::value_ptr(normal));
+        rotatorShader.setMat4("view", glm::value_ptr(view));
+        rotatorShader.setMat4("projection", glm::value_ptr(projection));
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
         glfwSwapBuffers(window); // use color buffer to draw
