@@ -14,32 +14,34 @@ struct Light {
 };
 
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    sampler2D emission;
+    sampler2D diffuse;
+    sampler2D specular;
     float shininess;
 };
 
 uniform Light light;
 uniform Material material;
-
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform float time;
 
 void main() {
-    vec3 ambient = material.ambient * light.ambient;
+    // emission
+    vec3 emission = vec3(texture(material.emission, texCoord)) * (sin(time * 3) + 0.5);
     
+    // ambient
+    vec3 ambient = vec3(texture(material.diffuse, texCoord)) * light.ambient;
+    
+    // diffuse
     vec3 normalDir = normalize(norm);
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normalDir, lightDir), 0.0);
-    vec3 diffuse = diff * material.diffuse * light.diffuse;
+    vec3 diffuse = diff * vec3(texture(material.diffuse, texCoord)) * light.diffuse;
     
+    // specular
     vec3 viewDir = normalize(-fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = spec * material.specular * light.specular;
+    vec3 specular = spec * vec3(texture(material.specular, texCoord)) * light.specular;
     
-    // linear interpolation (ratio for first texture and (1 - ratio) for second)
-    vec3 texColor = vec3(mix(texture(texture1, texCoord), texture(texture2, texCoord), 0.4));
-    fragColor = vec4((ambient + diffuse + specular) * texColor, 1.0);
+    fragColor = vec4(emission + ambient + diffuse + specular, 1.0);
 }

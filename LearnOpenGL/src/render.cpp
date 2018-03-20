@@ -233,28 +233,34 @@ void Render::renderLoop() {
     
     // OpenGL expects 0.0 of y axis lays on the top, so flip the image
     stbi_set_flip_vertically_on_load(true);
-    GLuint texture1 = loadTexture(path + "texture/awesomeface.png", GL_RGBA);
-    GLuint texture2 = loadTexture(path + "texture/container.jpg", GL_RGB);
+    GLuint texture = loadTexture(path + "texture/matrix.jpg", GL_RGB);
+    GLuint specularMap = loadTexture(path + "texture/container2_specular.png", GL_RGBA);
     
     // ------------------------------------
     // draw
     
     glEnable(GL_DEPTH_TEST);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specularMap);
+    
+    glm::vec3 lightColor = glm::vec3(1.0f);
+    glm::vec3 ambientColor = lightColor * 0.2f;
+    glm::vec3 diffuseColor = lightColor * 0.8f;
     
     lightShader.use();
+    lightShader.setVec3("lightColor", glm::value_ptr(lightColor));
     lightShader.setMat4("model", glm::value_ptr(light));
     
     rotatorShader.use();
-    rotatorShader.setInt("texture1", 0); // tell OpenGL which sampler corresponds to which texture
-    rotatorShader.setInt("texture2", 1);
+    rotatorShader.setInt("material.emission", 0); // tell OpenGL which sampler corresponds to which texture
+    rotatorShader.setInt("material.diffuse", 1);
+    rotatorShader.setInt("material.specular", 1);
     rotatorShader.setFloat("material.shininess", 0.4f * 128.0f);
-    rotatorShader.setVec3("material.ambient", 0.19225f, 0.19225f, 0.19225f);
-    rotatorShader.setVec3("material.diffuse", 0.50754f, 0.50754f, 0.50754f);
     rotatorShader.setVec3("material.specular", 0.508273f, 0.508273f, 0.508273f);
+    rotatorShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
+    rotatorShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
     rotatorShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
@@ -267,10 +273,6 @@ void Render::renderLoop() {
         glm::mat4 projection = camera.getProjectionMatrix();
         
         lightShader.use();
-        glm::vec3 lightColor = glm::vec3(pow(sin(glfwGetTime() * 0.5f), 2),
-                                         pow(sin(glfwGetTime() * 0.2f), 2),
-                                         pow(sin(glfwGetTime() * 0.8f), 2));
-        lightShader.setVec3("lightColor", glm::value_ptr(lightColor));
         lightShader.setMat4("view", glm::value_ptr(view));
         lightShader.setMat4("projection", glm::value_ptr(projection));
         glBindVertexArray(rotatorVAO);
@@ -279,12 +281,9 @@ void Render::renderLoop() {
         rotatorShader.use();
         rotator = glm::rotate(rotator, glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         glm::vec3 lightInView = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-        glm::vec3 ambientColor = lightColor * 0.2f;
-        glm::vec3 diffuseColor = lightColor * 0.8f;
         glm::mat3 normal = glm::transpose(glm::inverse(glm::mat3(view * rotator)));
+        rotatorShader.setFloat("time", lastFrame);
         rotatorShader.setVec3("light.position", glm::value_ptr(lightInView));
-        rotatorShader.setVec3("light.ambient", glm::value_ptr(ambientColor));
-        rotatorShader.setVec3("light.diffuse", glm::value_ptr(diffuseColor));
         rotatorShader.setMat4("model", glm::value_ptr(rotator));
         rotatorShader.setMat3("normal", glm::value_ptr(normal));
         rotatorShader.setMat4("view", glm::value_ptr(view));

@@ -39,6 +39,8 @@
 		BD4F03202053077500758FD3 /* shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		BD617C81205BDC9200DBBAAA /* shader_rotator.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_rotator.vs; sourceTree = "<group>"; };
 		BD617C82205BDCA200DBBAAA /* shader_rotator.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_rotator.fs; sourceTree = "<group>"; };
+		BD7D83FC2061AE9E00EE7CF2 /* container2_specular.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container2_specular.png; sourceTree = "<group>"; };
+		BD7D83FF2061B91F00EE7CF2 /* matrix.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = matrix.jpg; sourceTree = "<group>"; };
 		BD7DDDA620505BC700DA8EFF /* LearnOpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LearnOpenGL; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD7DDDB12050659D00DA8EFF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
@@ -71,6 +73,8 @@
 		BD265CD62054A5C200C13090 /* texture */ = {
 			isa = PBXGroup;
 			children = (
+				BD7D83FF2061B91F00EE7CF2 /* matrix.jpg */,
+				BD7D83FC2061AE9E00EE7CF2 /* container2_specular.png */,
 				BD265CD82054C90700C13090 /* awesomeface.png */,
 				BD265CD72054A5DE00C13090 /* container.jpg */,
 			);
