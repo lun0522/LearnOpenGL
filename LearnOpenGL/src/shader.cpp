@@ -110,6 +110,10 @@ void Shader::setFloat(const string &name, float value) const {
     glUniform1f(getUniform(name), value);
 }
 
+void Shader::setVec3(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2) const {
+    glUniform3f(getUniform(name), v0, v1, v2);
+}
+
 void Shader::setVec3(const std::string &name, GLfloat *value) const {
     glUniform3fv(getUniform(name), 1, value);
 }
