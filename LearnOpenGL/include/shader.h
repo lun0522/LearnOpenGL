@@ -17,7 +17,7 @@ class Shader {
 public:
     Shader(std::string vertexPath, std::string fragmentPath);
     GLuint programId;
-    void use();
+    void use() const;
     GLuint getUniform(const std::string &name) const;
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;

@@ -12,9 +12,6 @@
 #include <glad/include/glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "shader.h"
-#include "camera.h"
-
 class Render {
     GLFWwindow *window;
     void processKeyboardInput();
