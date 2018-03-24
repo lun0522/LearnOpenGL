@@ -22,19 +22,19 @@ class Camera {
     void updateViewMatrix();
     void updateProjectionMatrix();
 public:
-    Camera(glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 0.0f),
-           glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f),
-           glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f),
-           float cameraFov = 45.0f,
-           float cameraYaw = -90.0f,
-           float cameraPitch = 0.0f,
-           float mouseSensitivity = 0.05f);
-    void setScreenSize(int screenWidth, int screenHeight);
-    void processMouseMove(double xPos, double yPos);
-    void processMouseScroll(double yOffset);
-    void processKeyboardInput(CameraMoveDirection direction, float deltaTime);
-    glm::mat4& getViewMatrix();
-    glm::mat4& getProjectionMatrix();
+    Camera(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f),
+           const glm::vec3& front = glm::vec3(0.0f, 0.0f, -1.0f),
+           const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f),
+           const float fov = 45.0f,
+           const float yaw = -90.0f,
+           const float pitch = 0.0f,
+           const float sensitivity = 0.05f);
+    void setScreenSize(const int screenWidth, const int screenHeight);
+    void processMouseMove(const double xPos, const double yPos);
+    void processMouseScroll(const double yOffset);
+    void processKeyboardInput(const CameraMoveDirection direction, const float deltaTime);
+    const glm::mat4& getViewMatrix() const;
+    const glm::mat4& getProjectionMatrix() const;
 };
 
 #endif /* camera_h */

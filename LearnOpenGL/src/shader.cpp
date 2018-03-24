@@ -68,7 +68,7 @@ void validateLink(GLuint program) {
     }
 }
 
-Shader::Shader(string vertexPath, string fragmentPath) {
+Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
     GLuint vertex = createShader(GL_VERTEX_SHADER, readCode(vertexPath).c_str());
     GLuint fragment = createShader(GL_FRAGMENT_SHADER, readCode(fragmentPath).c_str());
     try {

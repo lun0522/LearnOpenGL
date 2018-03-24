@@ -8,8 +8,8 @@ out vec3 norm; // in view space
 out vec3 fragPos; // in view space
 out vec2 texCoord;
 
-uniform mat4 model;
 uniform mat3 normal;
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 

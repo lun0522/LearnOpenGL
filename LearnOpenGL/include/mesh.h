@@ -9,6 +9,7 @@
 #ifndef mesh_h
 #define mesh_h
 
+#include <string>
 #include <vector>
 #include <glad/include/glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -27,6 +28,7 @@ struct Vertex {
 struct Texture {
     GLuint id;
     TextureType type;
+    std::string path;
 };
 
 class Mesh {

@@ -14,9 +14,9 @@
 #include <GLFW/glfw3.h>
 
 class Shader {
-public:
-    Shader(std::string vertexPath, std::string fragmentPath);
     GLuint programId;
+public:
+    Shader(const std::string& vertexPath, const std::string& fragmentPath);
     void use() const;
     GLuint getUniform(const std::string &name) const;
     void setBool(const std::string &name, bool value) const;
