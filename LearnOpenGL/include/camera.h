@@ -16,7 +16,7 @@ enum CameraMoveDirection { UP, DOWN, LEFT, RIGHT };
 class Camera {
     glm::vec3 position, front, up, right;
     glm::mat4 viewMatrix, projectionMatrix;
-    float fov, yaw, pitch, width, height, lastX, lastY, sensitivity;
+    float fov, near, far, yaw, pitch, width, height, lastX, lastY, sensitivity;
     bool firstFrame;
     void updateRight();
     void updateViewMatrix();
@@ -26,6 +26,8 @@ public:
            const glm::vec3& front = glm::vec3(0.0f, 0.0f, -1.0f),
            const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f),
            const float fov = 45.0f,
+           const float near = 0.1f,
+           const float far = 100.0f,
            const float yaw = -90.0f,
            const float pitch = 0.0f,
            const float sensitivity = 0.05f);

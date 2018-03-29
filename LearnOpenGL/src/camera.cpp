@@ -14,11 +14,13 @@ Camera::Camera(const glm::vec3& position,
                const glm::vec3& front,
                const glm::vec3& up,
                const float fov,
+               const float near,
+               const float far,
                const float yaw,
                const float pitch,
                const float sensitivity):
 position(position), front(front), up(up),
-fov(fov), yaw(yaw), pitch(pitch),
+fov(fov), near(near), far(far), yaw(yaw), pitch(pitch),
 sensitivity(sensitivity), firstFrame(true) {
     updateRight();
     updateViewMatrix();
@@ -66,7 +68,7 @@ void Camera::processMouseScroll(const double yOffset) {
 }
 
 void Camera::processKeyboardInput(const CameraMoveDirection direction, const float deltaTime) {
-    float speed = deltaTime * 2.0f;
+    float speed = deltaTime * 5.0f;
     switch (direction) {
         case UP:
             position += front * speed;

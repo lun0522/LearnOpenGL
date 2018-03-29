@@ -186,19 +186,25 @@ void Render::renderLoop() {
     // draw
     
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    // actions to take when:
+    // stencil test fail
+    // stencil test pass && depth test fail
+    // stencil test pass && depth test pass
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     
     Model object("/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/texture/nanosuit/nanosuit.obj");
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, -1.0f));
-    model = glm::scale(model, glm::vec3(1.0f) * 0.3f);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, -1.0f));
+    model = glm::scale(model, glm::vec3(1.0f) * 0.5f);
     
     glm::vec3 lightColor(0.6f);
     glm::vec3 ambientColor = lightColor * 0.2f;
     glm::vec3 diffuseColor = lightColor * 0.8f;
     
     glm::vec3 pointLightPos[NUM_POINT_LIGHTS] = {
-        glm::vec3( 0.7f,  0.2f,  2.0f),
-        glm::vec3( 2.3f, -1.5f, -2.0f),
-        glm::vec3(-1.0f,  1.0f, -3.0f)
+        glm::vec3( 0.0f, -3.0f,  4.0f),
+        glm::vec3(-3.0f, -1.0f, -5.0f),
+        glm::vec3( 4.0f,  2.0f, -3.0f)
     };
     
     glm::vec3 pointLightColor[NUM_POINT_LIGHTS] = {
@@ -243,8 +249,8 @@ void Render::renderLoop() {
     objectShader.setVec3("spotLight.specular", glm::value_ptr(lightColor));
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
-        glClearColor(0.93f, 0.79f, 0.69f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.16f, 0.50f, 0.84f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         processKeyboardInput();
         
@@ -252,18 +258,38 @@ void Render::renderLoop() {
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix();
         
+        // enable any of ragments of lights (lamps) to update stencil buffer with 1
+        // so that later we know where we should not draw outlines
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); // let stencil test always pass
+        // each bit written to stencil buffer is ANDed with this mask
+        // set to 0xFF means to allow modifying stencil buffer
+        glStencilMask(0xFF);
+        
         lightShader.use();
         lightShader.setMat4("view", glm::value_ptr(view));
         lightShader.setMat4("projection", glm::value_ptr(projection));
         
-        // only point lights
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), pointLightPos[i]);
-            model = glm::scale(model, glm::vec3(0.2f));
+            model = glm::scale(model, glm::vec3(0.8f));
             lightShader.setMat4("model", glm::value_ptr(model));
             lightShader.setVec3("lightColor", glm::value_ptr(pointLightColor[i]));
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00); // disable updating stencil buffer (imagine when lamps overlap)
+        
+        for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), pointLightPos[i]);
+            model = glm::scale(model, glm::vec3(0.85f));
+            lightShader.setMat4("model", glm::value_ptr(model));
+            lightShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
         
         objectShader.use();
         model = glm::rotate(model, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));

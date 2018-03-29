@@ -158,9 +158,9 @@
 				BD265CD62054A5C200C13090 /* texture */,
 				BD849B602053AEA000393D9C /* shaders */,
 				BD7DDDBF20506B0300DA8EFF /* main.cpp */,
+				BD9252522058C76500F6779C /* render.cpp */,
 				BD4F031E2053076200758FD3 /* shader.cpp */,
 				BD92524F2058B89100F6779C /* camera.cpp */,
-				BD9252522058C76500F6779C /* render.cpp */,
 				BD5B70D32063F4C1001CFEF8 /* mesh.cpp */,
 				BD426EC020656C1600EE7ACA /* model.cpp */,
 			);
@@ -170,9 +170,9 @@
 		BD7DDDC020506B0300DA8EFF /* include */ = {
 			isa = PBXGroup;
 			children = (
+				BD9252512058C6A300F6779C /* render.h */,
 				BD4F03202053077500758FD3 /* shader.h */,
 				BD92524E2058B85400F6779C /* camera.h */,
-				BD9252512058C6A300F6779C /* render.h */,
 				BD5B70D22063F4A9001CFEF8 /* mesh.h */,
 				BD426EBF20656C0500EE7ACA /* model.h */,
 			);
