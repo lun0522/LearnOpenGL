@@ -54,16 +54,18 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
     
     // load textures
     vector<Texture> textures;
-    aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-    vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, DIFFUSE);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, SPECULAR);
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    if (scene->HasMaterials()) {
+        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, DIFFUSE);
+        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, SPECULAR);
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    }
     
     return Mesh(vertices, indices, textures);
 }
 
-GLuint textureFromFile(const string& path) {
+GLuint Model::textureFromFile(const string& path) {
     int width, height, channel;
     stbi_uc *data = stbi_load(path.c_str(), &width, &height, &channel, 0);
     if (!data) throw "Failed to load texture from " + path;
@@ -123,18 +125,20 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
     return textures;
 }
 
-Model::Model(const string& path, const bool gammaCorrection): gamma(gammaCorrection) {
+Model::Model(const std::string& objPath,
+             const std::string& texPath,
+             const bool gammaCorrection):
+directory(texPath), gamma(gammaCorrection) {
     Assimp::Importer importer;
     // other useful options:
     // aiProcess_GenNormals: create normal for vertices
     // aiProcess_SplitLargeMeshes: split mesh when the number of triangles that can be rendered at a time is limited
     // aiProcess_OptimizeMeshes: do the reverse of splitting, merge meshes to reduce drawing calls
-    const aiScene *scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene *scene = importer.ReadFile(objPath.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
     
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         throw "Failed to import scene: " + string(importer.GetErrorString());
     
-    directory = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
 }
 

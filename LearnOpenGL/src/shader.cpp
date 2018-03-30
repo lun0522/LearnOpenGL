@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
 
@@ -114,15 +115,15 @@ void Shader::setVec3(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2
     glUniform3f(getUniform(name), v0, v1, v2);
 }
 
-void Shader::setVec3(const std::string &name, GLfloat *value) const {
-    glUniform3fv(getUniform(name), 1, value);
+void Shader::setVec3(const std::string &name, glm::vec3& value) const {
+    glUniform3fv(getUniform(name), 1, glm::value_ptr(value));
 }
 
-void Shader::setMat3(const std::string &name, GLfloat *value) const {
+void Shader::setMat3(const std::string &name, glm::mat3& value) const {
     // how many matrices to send, transpose or not (GLM is already in coloumn order, so no)
-    glUniformMatrix3fv(getUniform(name), 1, GL_FALSE, value);
+    glUniformMatrix3fv(getUniform(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::setMat4(const std::string &name, GLfloat *value) const {
-    glUniformMatrix4fv(getUniform(name), 1, GL_FALSE, value);
+void Shader::setMat4(const std::string &name, glm::mat4& value) const {
+    glUniformMatrix4fv(getUniform(name), 1, GL_FALSE, glm::value_ptr(value));
 }

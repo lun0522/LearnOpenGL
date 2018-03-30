@@ -27,8 +27,11 @@ class Model {
                                               const aiTextureType aiType,
                                               const TextureType type);
 public:
-    Model(const std::string& path, const bool gammaCorrection = false);
+    Model(const std::string& objPath,
+          const std::string& texPath = "",
+          const bool gammaCorrection = false);
     void draw(const Shader& shader) const;
+    static GLuint textureFromFile(const std::string& path);
 };
 
 #endif /* model_h */

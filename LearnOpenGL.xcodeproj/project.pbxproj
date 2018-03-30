@@ -34,8 +34,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BD265CD72054A5DE00C13090 /* container.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = container.jpg; sourceTree = "<group>"; };
-		BD265CD82054C90700C13090 /* awesomeface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = awesomeface.png; sourceTree = "<group>"; };
 		BD3E65352055C1D700B22D12 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BD3E65372055C1EF00B22D12 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		BD426EBF20656C0500EE7ACA /* model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
@@ -44,17 +42,19 @@
 		BD4F03202053077500758FD3 /* shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		BD5B70D22063F4A9001CFEF8 /* mesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mesh.h; sourceTree = "<group>"; };
 		BD5B70D32063F4C1001CFEF8 /* mesh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mesh.cpp; sourceTree = "<group>"; };
+		BD5E9209206DBA8D00635CBC /* glass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = glass.png; sourceTree = "<group>"; };
+		BD5E920B206DBADB00635CBC /* shader_glass.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_glass.vs; sourceTree = "<group>"; };
+		BD5E920C206DBAE500635CBC /* shader_glass.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_glass.fs; sourceTree = "<group>"; };
+		BD5E920D206DBFA600635CBC /* cube.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cube.obj; sourceTree = "<group>"; };
 		BD617C81205BDC9200DBBAAA /* shader_object.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.vs; sourceTree = "<group>"; };
 		BD617C82205BDCA200DBBAAA /* shader_object.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.fs; sourceTree = "<group>"; };
-		BD7D83FC2061AE9E00EE7CF2 /* container2_specular.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container2_specular.png; sourceTree = "<group>"; };
-		BD7D83FF2061B91F00EE7CF2 /* matrix.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = matrix.jpg; sourceTree = "<group>"; };
 		BD7DDDA620505BC700DA8EFF /* LearnOpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LearnOpenGL; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD7DDDB12050659D00DA8EFF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
 		BD7DDDB6205068BE00DA8EFF /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		BD7DDDBF20506B0300DA8EFF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		BD849B612053AEA000393D9C /* shader_light.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_light.vs; sourceTree = "<group>"; };
-		BD849B622053AEA000393D9C /* shader_light.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_light.fs; sourceTree = "<group>"; };
+		BD849B612053AEA000393D9C /* shader_lamp.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_lamp.vs; sourceTree = "<group>"; };
+		BD849B622053AEA000393D9C /* shader_lamp.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_lamp.fs; sourceTree = "<group>"; };
 		BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.4.1.0.dylib; path = ../../../../../usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib; sourceTree = "<group>"; };
 		BD90428B2065CC9400827029 /* body_showroom_ddn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = body_showroom_ddn.png; sourceTree = "<group>"; };
 		BD90428C2065CC9400827029 /* helmet_showroom_ddn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helmet_showroom_ddn.png; sourceTree = "<group>"; };
@@ -104,10 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				BD90428A2065CC9400827029 /* nanosuit */,
-				BD7D83FF2061B91F00EE7CF2 /* matrix.jpg */,
-				BD7D83FC2061AE9E00EE7CF2 /* container2_specular.png */,
-				BD265CD82054C90700C13090 /* awesomeface.png */,
-				BD265CD72054A5DE00C13090 /* container.jpg */,
+				BD5E9209206DBA8D00635CBC /* glass.png */,
+				BD5E920D206DBFA600635CBC /* cube.obj */,
 			);
 			path = texture;
 			sourceTree = "<group>";
@@ -182,8 +180,10 @@
 		BD849B602053AEA000393D9C /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				BD849B612053AEA000393D9C /* shader_light.vs */,
-				BD849B622053AEA000393D9C /* shader_light.fs */,
+				BD849B612053AEA000393D9C /* shader_lamp.vs */,
+				BD849B622053AEA000393D9C /* shader_lamp.fs */,
+				BD5E920B206DBADB00635CBC /* shader_glass.vs */,
+				BD5E920C206DBAE500635CBC /* shader_glass.fs */,
 				BD617C81205BDC9200DBBAAA /* shader_object.vs */,
 				BD617C82205BDCA200DBBAAA /* shader_object.fs */,
 			);
