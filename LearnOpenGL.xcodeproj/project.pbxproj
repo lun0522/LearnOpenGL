@@ -34,6 +34,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BD349940206EA4F900429E58 /* shader_screen.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.vs; sourceTree = "<group>"; };
+		BD349941206EA50100429E58 /* shader_screen.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.fs; sourceTree = "<group>"; };
 		BD3E65352055C1D700B22D12 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BD3E65372055C1EF00B22D12 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		BD426EBF20656C0500EE7ACA /* model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
@@ -186,6 +188,8 @@
 				BD5E920C206DBAE500635CBC /* shader_glass.fs */,
 				BD617C81205BDC9200DBBAAA /* shader_object.vs */,
 				BD617C82205BDCA200DBBAAA /* shader_object.fs */,
+				BD349940206EA4F900429E58 /* shader_screen.vs */,
+				BD349941206EA50100429E58 /* shader_screen.fs */,
 			);
 			path = shaders;
 			sourceTree = "<group>";

@@ -16,25 +16,30 @@
 
 using std::string;
 
+typedef struct ScreenSize {
+    int width;
+    int height;
+} ScreenSize;
+
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int NUM_POINT_LIGHTS = 3;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastFrame = 0.0f;
+ScreenSize originalSize{0, 0};
+ScreenSize currentSize{0, 0};
 
-typedef struct ScreenSize {
-    int width;
-    int height;
-} ScreenSize;
-
-ScreenSize getScreenSize(GLFWwindow *window) {
+void updateScreenSize(GLFWwindow *window) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    return { width, height };
+    currentSize.width = width;
+    currentSize.height = height;
 }
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+    currentSize.width = width;
+    currentSize.height = height;
     glViewport(0, 0, width, height);
 }
 
@@ -97,9 +102,10 @@ Render::Render() {
     if (!gladLoadGL()) throw "Failed to init GLAD";
     
     // screen size is different from the input width and height on retina screen
-    ScreenSize size = getScreenSize(window);
-    glViewport(0, 0, size.width, size.height); // specify render area
-    camera.setScreenSize(size.width, size.height);
+    updateScreenSize(window);
+    originalSize = currentSize;
+    glViewport(0, 0, currentSize.width, currentSize.height); // specify render area
+    camera.setScreenSize(currentSize.width, currentSize.height);
 }
 
 void Render::renderLoop() {
@@ -113,6 +119,8 @@ void Render::renderLoop() {
                                 path + "shaders/shader_glass.fs");
     Shader objectShader = Shader(path + "shaders/shader_object.vs",
                                  path + "shaders/shader_object.fs");
+    Shader screenShader = Shader(path + "shaders/shader_screen.vs",
+                                 path + "shaders/shader_screen.fs");
     
     
     // ------------------------------------
@@ -122,7 +130,7 @@ void Render::renderLoop() {
     Model object(path + "texture/nanosuit/nanosuit.obj", path + "texture/nanosuit");
     
     GLuint texture = Model::textureFromFile(path + "texture/glass.png");
-    float vertices[] = {
+    float glassVert[] = {
         // front side
          1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
         -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -141,18 +149,73 @@ void Render::renderLoop() {
          1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
         -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     };
-    GLuint VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    GLuint glassVAO, glassVBO;
+    glGenVertexArrays(1, &glassVAO);
+    glBindVertexArray(glassVAO);
+    glGenBuffers(1, &glassVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, glassVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glassVert), glassVert, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(0 * sizeof(float)));
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    float screenVert[] {
+         1.0f,  1.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+    };
+    GLuint screenVAO, screenVBO;
+    glGenVertexArrays(1, &screenVAO);
+    glBindVertexArray(screenVAO);
+    glGenBuffers(1, &screenVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screenVert), screenVert, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(0 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    
+    // ------------------------------------
+    // extra framebuffer
+    
+    // framebuffer holds color, depth (optinal) and stencil (option) buffer
+    GLuint framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    
+    // framebuffer should have at least one color attachment (can have multiple)
+    GLuint texColorBuffer;
+    glGenTextures(1, &texColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, currentSize.width, currentSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // data is set to NULL, because later contents will be rendered to it
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // no need for mipmap
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+    
+    // render buffer is preferred when we don't need to sample data (depth/stencil)
+    // otherwise we use texture (color)
+    GLuint RBO;
+    glGenRenderbuffers(1, &RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    // enable to store both depth and stencil buffer (also only allocate memory, without content)
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, currentSize.width, currentSize.height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        throw "Frame buffer incomplete";
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
     
     // ------------------------------------
@@ -220,29 +283,36 @@ void Render::renderLoop() {
     // ------------------------------------
     // draw
     
-    // for closed shapes, omit clockwise triangles
-    // glass should be double-sided (see vertices of glass)
-    // otherwise we have to disable face culling when drawing it
-    glEnable(GL_CULL_FACE);
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    // actions to take when:
-    // stencil test fail
-    // stencil test pass && depth test fail
-    // stencil test pass && depth test pass
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    
-    glEnable(GL_BLEND);
-    // src * alpha + dst * (1.0 - alpha)
-    // dst refers to value that already exists in color buffer
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
     while (!glfwWindowShouldClose(window)) { // until user hit close
+        processKeyboardInput();
+        
+        // ------------------------------------
+        // render to texture of customized framebuffer first
+        // later use this texture for default framebuffer
+        // always render in orignal size, let customized framebuffer deal with resizing
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glViewport(0, 0, originalSize.width, originalSize.height);
+        
+        // for closed shapes, omit clockwise triangles
+        // glass should be double-sided (see vertices of glass)
+        // otherwise we have to disable face culling when drawing it
+        glEnable(GL_CULL_FACE);
+        
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        // actions to take when:
+        // stencil test fail
+        // stencil test pass && depth test fail
+        // stencil test pass && depth test pass
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        
+        glEnable(GL_BLEND);
+        // src * alpha + dst * (1.0 - alpha)
+        // dst refers to value that already exists in color buffer
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
         glClearColor(0.16f, 0.50f, 0.84f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        
-        processKeyboardInput();
         
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix();
@@ -306,8 +376,32 @@ void Render::renderLoop() {
         glassShader.setMat4("projection", projection);
         glassShader.setInt("texture1", 0);
         
-        glBindVertexArray(VAO);
+        glBindVertexArray(glassVAO);
         glDrawArrays(GL_TRIANGLES, 0, 12);
+        glBindVertexArray(0);
+        
+        // ------------------------------------
+        // switch back to default framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_BLEND);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+        screenShader.use();
+        screenShader.setInt("texture1", 0);
+        
+        glBindVertexArray(screenVAO);
+        
+        glViewport(0, 0, currentSize.width, currentSize.height);
+        glDrawArrays(GL_TRIANGLES, 0, 6); // draw screen in original size
+        
+        glViewport(0, 0, currentSize.width / 4, currentSize.height / 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6); // draw screen in small size
+        
         glBindVertexArray(0);
         
         glfwSwapBuffers(window); // use color buffer to draw
