@@ -6,7 +6,7 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#include "mesh.h"
+#include "mesh.hpp"
 
 Mesh::Mesh(const std::vector<Vertex>& vertices,
            const std::vector<GLuint>& indices,
@@ -50,10 +50,10 @@ vertices(vertices), indices(indices), textures(textures) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::draw(const Shader& shader) const {
+void Mesh::draw(const Shader& shader, const GLuint texOffset) const {
     shader.use();
     
-    int diffIdx = 0, specIdx = 0;
+    int diffIdx = 0, specIdx = 0, reflIdx = 0;
     for (int i = 0; i < textures.size(); ++i) {
         std::string name;
         switch (textures[i].type) {
@@ -63,12 +63,16 @@ void Mesh::draw(const Shader& shader) const {
             case SPECULAR:
                 name = "material.specular" + std::to_string(specIdx++);
                 break;
+            case REFLECTION:
+                name = "material.reflection" + std::to_string(reflIdx++);
+                break;
             default:
                 throw "Unknown texture type";
         }
-        glActiveTexture(GL_TEXTURE0 + i);
+        GLuint texIndex = texOffset + i;
+        glActiveTexture(GL_TEXTURE0 + texIndex);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
-        shader.setInt(name, i);
+        shader.setInt(name, texIndex);
     }
     
     glBindVertexArray(VAO);

@@ -44,12 +44,14 @@ struct SpotLight {
 };
 
 struct Material {
-    sampler2D emission;
     sampler2D diffuse0;
     sampler2D specular0;
+    sampler2D reflection0;
+    samplerCube envMap;
     float shininess;
 };
 
+uniform mat4 view;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
 uniform SpotLight spotLight;
@@ -108,6 +110,12 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
     return (ambient + (diffuse + specular) * intensity) * attenuation;
 }
 
+vec3 calcReflection(vec3 normal, vec3 viewDir) {
+    vec3 reflectDir = reflect(-viewDir, normal);
+    reflectDir = inverse(mat3(view)) * reflectDir; // back to world coordinate
+    return texture(material.envMap, reflectDir).rgb;
+}
+
 void main() {
     vec3 normal = normalize(norm);
     vec3 viewDir = normalize(-fragPos);
@@ -117,6 +125,8 @@ void main() {
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
         outColor += calcPointLight(pointLights[i], normal, viewDir);
     outColor += calcSpotLight(spotLight, normal, viewDir);
+    outColor = mix(outColor, calcReflection(normal, viewDir),
+                   texture(material.reflection0, texCoord).r);
     
     fragColor = vec4(outColor, 1.0);
 }

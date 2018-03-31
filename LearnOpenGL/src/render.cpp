@@ -6,13 +6,16 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
+#include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.h"
-#include "camera.h"
-#include "model.h"
-#include "render.h"
+#include "shader.hpp"
+#include "camera.hpp"
+#include "loader.hpp"
+#include "model.hpp"
+#include "render.hpp"
 
 using std::string;
 
@@ -25,7 +28,7 @@ const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int NUM_POINT_LIGHTS = 3;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 float lastFrame = 0.0f;
 ScreenSize originalSize{0, 0};
 ScreenSize currentSize{0, 0};
@@ -113,75 +116,37 @@ void Render::renderLoop() {
     // shader program
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
-    Shader lampShader = Shader(path + "shaders/shader_lamp.vs",
-                               path + "shaders/shader_lamp.fs");
-    Shader glassShader = Shader(path + "shaders/shader_glass.vs",
-                                path + "shaders/shader_glass.fs");
-    Shader objectShader = Shader(path + "shaders/shader_object.vs",
-                                 path + "shaders/shader_object.fs");
-    Shader screenShader = Shader(path + "shaders/shader_screen.vs",
-                                 path + "shaders/shader_screen.fs");
+    Shader lampShader(path + "shaders/shader_lamp.vs",
+                      path + "shaders/shader_lamp.fs");
+    Shader glassShader(path + "shaders/shader_glass.vs",
+                       path + "shaders/shader_glass.fs");
+    Shader objectShader(path + "shaders/shader_object.vs",
+                        path + "shaders/shader_object.fs");
+    Shader skyboxShader(path + "shaders/shader_skybox.vs",
+                        path + "shaders/shader_skybox.fs");
+    Shader screenShader(path + "shaders/shader_screen.vs",
+                        path + "shaders/shader_screen.fs");
     
     
     // ------------------------------------
     // models
     
     Model lamp(path + "texture/cube.obj");
+    Model glass(path + "texture/glass.obj");
+    Model skybox(path + "texture/skybox.obj");
+    Model screen(path + "texture/screen.obj");
     Model object(path + "texture/nanosuit/nanosuit.obj", path + "texture/nanosuit");
     
-    GLuint texture = Model::textureFromFile(path + "texture/glass.png");
-    float glassVert[] = {
-        // front side
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        
-        // back side
-         1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-        
-         1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-         1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    std::vector<string> boxfaces {
+        "right.tga",
+        "left.tga",
+        "top.tga",
+        "bottom.tga",
+        "back.tga",
+        "front.tga",
     };
-    GLuint glassVAO, glassVBO;
-    glGenVertexArrays(1, &glassVAO);
-    glBindVertexArray(glassVAO);
-    glGenBuffers(1, &glassVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, glassVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glassVert), glassVert, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(0 * sizeof(float)));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    float screenVert[] {
-         1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
-    };
-    GLuint screenVAO, screenVBO;
-    glGenVertexArrays(1, &screenVAO);
-    glBindVertexArray(screenVAO);
-    glGenBuffers(1, &screenVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screenVert), screenVert, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(0 * sizeof(float)));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    GLuint skyboxTex = Loader::loadCubemap(path + "texture/tidepool", boxfaces);
+    GLuint glassTex = Loader::loadTexture(path + "texture/glass.png");
     
     
     // ------------------------------------
@@ -221,18 +186,18 @@ void Render::renderLoop() {
     // ------------------------------------
     // parameters
     
-    glm::mat4 objectModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, -6.0f));
+    glm::mat4 objectModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
     objectModel = glm::scale(objectModel, glm::vec3(1.0f) * 0.5f);
-    glm::mat4 glassModel(1.0f);
+    glm::mat4 glassModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
     
     glm::vec3 lightColor(0.6f);
     glm::vec3 ambientColor = lightColor * 0.2f;
     glm::vec3 diffuseColor = lightColor * 0.8f;
     
     glm::vec3 lampPos[NUM_POINT_LIGHTS] = {
-        glm::vec3( 0.0f, -3.0f, -2.0f),
-        glm::vec3(-4.0f, -1.0f, -9.0f),
-        glm::vec3( 4.0f,  2.0f, -8.0f)
+        glm::vec3( 0.0f, -3.0f,  4.0f),
+        glm::vec3(-4.0f, -1.0f, -3.0f),
+        glm::vec3( 4.0f,  2.0f, -2.0f)
     };
     
     glm::vec3 lampColor[NUM_POINT_LIGHTS] = {
@@ -245,7 +210,7 @@ void Render::renderLoop() {
     objectShader.setFloat("material.shininess", 0.2f);
     
     // directional light
-    glm::vec3 dirLight(-1.0f, -1.0f, -1.0f);
+    glm::vec3 dirLight(0.0f, -1.0f, 1.0f);
     objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
     objectShader.setVec3("dirLight.diffuse", ambientColor);
     objectShader.setVec3("dirLight.specular", lightColor);
@@ -284,12 +249,10 @@ void Render::renderLoop() {
     // draw
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
-        processKeyboardInput();
-        
-        // ------------------------------------
         // render to texture of customized framebuffer first
         // later use this texture for default framebuffer
         // always render in orignal size, let customized framebuffer deal with resizing
+        processKeyboardInput();
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, originalSize.width, originalSize.height);
         
@@ -311,18 +274,18 @@ void Render::renderLoop() {
         // dst refers to value that already exists in color buffer
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        glClearColor(0.16f, 0.50f, 0.84f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix();
         
+        
+        // ------------------------------------
+        // render lamps with outlines
+        
         // enable any of ragments of lights (lamps) to update stencil buffer with 1
         // so that later we know where we should not draw outlines
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // let stencil test always pass
-        // each bit written to stencil buffer is ANDed with this mask
-        // set to 0xFF means to allow modifying stencil buffer
-        glStencilMask(0xFF);
         
         lampShader.use();
         lampShader.setMat4("view", view);
@@ -350,6 +313,10 @@ void Render::renderLoop() {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
         
+        
+        // ------------------------------------
+        // render object
+        
         objectShader.use();
         objectModel = glm::rotate(objectModel, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat3 normal = glm::transpose(glm::inverse(glm::mat3(view * objectModel)));
@@ -357,6 +324,10 @@ void Render::renderLoop() {
         objectShader.setMat4("model", objectModel);
         objectShader.setMat4("view", view);
         objectShader.setMat4("projection", projection);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
+        objectShader.setInt("material.envMap", 0);
         
         // lights direction in camera space
         glm::vec3 dirLightDir = glm::vec3(view * glm::vec4(dirLight, 0.0f));
@@ -367,21 +338,45 @@ void Render::renderLoop() {
                                  pointLightDir);
         }
         
-        object.draw(objectShader);
+        object.draw(objectShader, 1);
         
+        
+        // ------------------------------------
+        // render skybox as background
+        
+        // render this after all oblique objects are rendered
+        // a trick: set depth to be 1.0 by setting gl_Position.zw to 1.0
+        //          and depth function to GL_LEQUAL, so that skybox lays
+        //          right on maximum depth
+        glDepthFunc(GL_LEQUAL);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
+        skyboxShader.use();
+        skyboxShader.setInt("skybox", 0);
+        // ignore translation, so that camera never moves relative to skybox
+        glm::mat4 skyboxView = glm::mat4(glm::mat3(view));
+        skyboxShader.setMat4("view", skyboxView);
+        skyboxShader.setMat4("projection", projection);
+        skybox.draw(skyboxShader);
+        glDepthFunc(GL_LESS);
+        
+        
+        // ------------------------------------
+        // render semi-transparent glass
+        
+        // render this at last because of alpha blending
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, glassTex);
         glassShader.use();
         glassShader.setMat4("view", view);
         glassShader.setMat4("projection", projection);
         glassShader.setInt("texture1", 0);
+        glass.draw(glassShader);
         
-        glBindVertexArray(glassVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 12);
-        glBindVertexArray(0);
         
         // ------------------------------------
         // switch back to default framebuffer
+        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
         glDisable(GL_CULL_FACE);
@@ -394,15 +389,11 @@ void Render::renderLoop() {
         screenShader.use();
         screenShader.setInt("texture1", 0);
         
-        glBindVertexArray(screenVAO);
-        
         glViewport(0, 0, currentSize.width, currentSize.height);
-        glDrawArrays(GL_TRIANGLES, 0, 6); // draw screen in original size
+        screen.draw(screenShader); // draw screen in original size
         
         glViewport(0, 0, currentSize.width / 4, currentSize.height / 4);
-        glDrawArrays(GL_TRIANGLES, 0, 6); // draw screen in small size
-        
-        glBindVertexArray(0);
+        screen.draw(screenShader); // draw screen in small size
         
         glfwSwapBuffers(window); // use color buffer to draw
         glfwPollEvents(); // check events (keyboard, mouse, ...)

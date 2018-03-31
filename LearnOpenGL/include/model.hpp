@@ -1,20 +1,20 @@
 //
-//  model.h
+//  model.hpp
 //  LearnOpenGL
 //
 //  Created by Pujun Lun on 3/23/18.
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#ifndef model_h
-#define model_h
+#ifndef model_hpp
+#define model_hpp
 
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <assimp/scene.h>
 
-#include "mesh.h"
+#include "mesh.hpp"
 
 class Model {
     const bool gamma;
@@ -30,8 +30,8 @@ public:
     Model(const std::string& objPath,
           const std::string& texPath = "",
           const bool gammaCorrection = false);
-    void draw(const Shader& shader) const;
-    static GLuint textureFromFile(const std::string& path);
+    void draw(const Shader& shader,
+              const GLuint texOffset = 0) const;
 };
 
 #endif /* model_h */

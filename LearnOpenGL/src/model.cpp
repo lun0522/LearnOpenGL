@@ -6,13 +6,11 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <iostream>
 
-#include "model.h"
+#include "loader.hpp"
+#include "model.hpp"
 
 using std::string;
 using std::vector;
@@ -60,48 +58,11 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, SPECULAR);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        vector<Texture> reflectionMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, REFLECTION);
+        textures.insert(textures.end(), reflectionMaps.begin(), reflectionMaps.end());
     }
     
     return Mesh(vertices, indices, textures);
-}
-
-GLuint Model::textureFromFile(const string& path) {
-    int width, height, channel;
-    stbi_uc *data = stbi_load(path.c_str(), &width, &height, &channel, 0);
-    if (!data) throw "Failed to load texture from " + path;
-    
-    GLenum format;
-    switch (channel) {
-        case 1:
-            format = GL_RED;
-            break;
-        case 3:
-            format = GL_RGB;
-            break;
-        case 4:
-            format = GL_RGBA;
-            break;
-        default:
-            throw "Unknown texture format (channel=" + std::to_string(channel) + ")";
-    }
-    
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    // texture target, minmap level, texture format, width, height, always 0, image format, dtype, data
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D); // automatically generate all required minmaps
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    stbi_image_free(data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
-    return texture;
 }
 
 vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
@@ -115,7 +76,7 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
         
         auto loaded = loadedTexture.find(filename);
         if (loaded == loadedTexture.end()) {
-            Texture texture = { textureFromFile(directory + '/' + filename), type, filename };
+            Texture texture = { Loader::loadTexture(directory + '/' + filename), type, filename };
             textures.push_back(texture);
             loadedTexture.insert({ filename, texture });
         } else {
@@ -125,8 +86,8 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
     return textures;
 }
 
-Model::Model(const std::string& objPath,
-             const std::string& texPath,
+Model::Model(const string& objPath,
+             const string& texPath,
              const bool gammaCorrection):
 directory(texPath), gamma(gammaCorrection) {
     Assimp::Importer importer;
@@ -142,7 +103,7 @@ directory(texPath), gamma(gammaCorrection) {
     processNode(scene->mRootNode, scene);
 }
 
-void Model::draw(const Shader& shader) const {
+void Model::draw(const Shader& shader, const GLuint texOffset) const {
     for (int i = 0; i < meshes.size(); ++i)
-        meshes[i].draw(shader);
+        meshes[i].draw(shader, texOffset);
 }

@@ -8,7 +8,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "camera.h"
+#include "camera.hpp"
 
 Camera::Camera(const glm::vec3& position,
                const glm::vec3& front,

@@ -8,10 +8,9 @@
 
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.h"
+#include "shader.hpp"
 
 using std::string;
 
@@ -94,7 +93,7 @@ void Shader::use() const {
 }
 
 GLuint Shader::getUniform(const string &name) const {
-    GLint location = glad_glGetUniformLocation(programId, name.c_str());
+    GLint location = glGetUniformLocation(programId, name.c_str());
     if (location != -1) return location;
     else throw string("Cannot find uniform " + name);
 }

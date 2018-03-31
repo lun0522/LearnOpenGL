@@ -1,13 +1,13 @@
 //
-//  mesh.h
+//  mesh.hpp
 //  LearnOpenGL
 //
 //  Created by Pujun Lun on 3/22/18.
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#ifndef mesh_h
-#define mesh_h
+#ifndef mesh_hpp
+#define mesh_hpp
 
 #include <string>
 #include <vector>
@@ -15,9 +15,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "shader.h"
+#include "shader.hpp"
 
-enum TextureType { DIFFUSE, SPECULAR };
+enum TextureType { DIFFUSE, SPECULAR, REFLECTION };
 
 struct Vertex {
     glm::vec3 position;
@@ -40,7 +40,7 @@ public:
     Mesh(const std::vector<Vertex>& vertices,
          const std::vector<GLuint>& indices,
          const std::vector<Texture>& textures);
-    void draw(const Shader& shader) const;
+    void draw(const Shader& shader, const GLuint texOffset) const;
 };
 
 #endif /* mesh_h */

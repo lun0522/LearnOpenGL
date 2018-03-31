@@ -1,13 +1,13 @@
 //
-//  shader.h
+//  shader.hpp
 //  LearnOpenGL
 //
 //  Created by Pujun Lun on 3/9/18.
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#ifndef shader_h
-#define shader_h
+#ifndef shader_hpp
+#define shader_hpp
 
 #include <string>
 #include <glad/include/glad/glad.h>

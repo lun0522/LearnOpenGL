@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "render.h"
+#include "render.hpp"
 
 using std::string;
 
@@ -18,9 +18,11 @@ int main(int argc, const char * argv[]) {
         render.renderLoop();
         glfwTerminate();
         return 0;
-    } catch (string err) {
+    } catch (const string& err) {
         std::cerr << "Error: " << err << std::endl;
-        glfwTerminate();
-        return -1;
+    } catch (const char *err) {
+        std::cerr << "Error: " << err << std::endl;
     }
+    glfwTerminate();
+    return -1;
 }

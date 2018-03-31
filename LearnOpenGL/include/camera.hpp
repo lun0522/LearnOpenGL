@@ -1,13 +1,13 @@
 //
-//  camera.h
+//  camera.hpp
 //  LearnOpenGL
 //
 //  Created by Pujun Lun on 3/13/18.
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#ifndef camera_h
-#define camera_h
+#ifndef camera_hpp
+#define camera_hpp
 
 #include <glm/glm.hpp>
 
