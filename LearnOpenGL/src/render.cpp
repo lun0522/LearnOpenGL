@@ -6,9 +6,11 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.hpp"
@@ -30,6 +32,7 @@ const int NUM_POINT_LIGHTS = 3;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 float lastFrame = 0.0f;
+float explosion = 0.0f;
 ScreenSize originalSize{0, 0};
 ScreenSize currentSize{0, 0};
 
@@ -72,6 +75,10 @@ void Render::processKeyboardInput() {
         camera.processKeyboardInput(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         camera.processKeyboardInput(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        explosion = std::max(0.0f, explosion - 0.1f);
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        explosion = std::min(9.9f, explosion + 0.1f);
 }
 
 Render::Render() {
@@ -121,7 +128,8 @@ void Render::renderLoop() {
     Shader glassShader(path + "shaders/shader_glass.vs",
                        path + "shaders/shader_glass.fs");
     Shader objectShader(path + "shaders/shader_object.vs",
-                        path + "shaders/shader_object.fs");
+                        path + "shaders/shader_object.fs",
+                        path + "shaders/shader_object.gs");
     Shader skyboxShader(path + "shaders/shader_skybox.vs",
                         path + "shaders/shader_skybox.fs");
     Shader screenShader(path + "shaders/shader_screen.vs",
@@ -186,6 +194,24 @@ void Render::renderLoop() {
     // ------------------------------------
     // parameters
     
+    GLuint uboMatrices; // used to store view and projection matrices
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW); // no data yet
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboMatrices); // or use glBindBufferRange for flexibility
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    
+    std::vector<Shader> shaders {
+        lampShader,
+        glassShader,
+        objectShader,
+        skyboxShader,
+    };
+    for (Shader& shader: shaders) {
+        shader.use();
+        shader.setBlock("Matrices", 0);
+    }
+    
     glm::mat4 objectModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
     objectModel = glm::scale(objectModel, glm::vec3(1.0f) * 0.5f);
     glm::mat4 glassModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
@@ -207,6 +233,7 @@ void Render::renderLoop() {
     };
     
     objectShader.use();
+    objectShader.setMat4("model", objectModel);
     objectShader.setFloat("material.shininess", 0.2f);
     
     // directional light
@@ -248,6 +275,9 @@ void Render::renderLoop() {
     // ------------------------------------
     // draw
     
+    int frameCount = 0;
+    double lastTime = glfwGetTime();
+    
     while (!glfwWindowShouldClose(window)) { // until user hit close
         // render to texture of customized framebuffer first
         // later use this texture for default framebuffer
@@ -276,8 +306,13 @@ void Render::renderLoop() {
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
+        // set once, use anywhere
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjectionMatrix();
+        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         
         
         // ------------------------------------
@@ -288,9 +323,6 @@ void Render::renderLoop() {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // let stencil test always pass
         
         lampShader.use();
-        lampShader.setMat4("view", view);
-        lampShader.setMat4("projection", projection);
-        
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             glm::mat4 lampModel = glm::translate(glm::mat4(1.0f), lampPos[i]);
             lampModel = glm::scale(lampModel, glm::vec3(0.8f));
@@ -317,13 +349,14 @@ void Render::renderLoop() {
         // ------------------------------------
         // render object
         
+        glDisable(GL_CULL_FACE);
+        
         objectShader.use();
-        objectModel = glm::rotate(objectModel, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        objectShader.setFloat("explosion", explosion);
         glm::mat3 normal = glm::transpose(glm::inverse(glm::mat3(view * objectModel)));
         objectShader.setMat3("normal", normal);
-        objectShader.setMat4("model", objectModel);
-        objectShader.setMat4("view", view);
-        objectShader.setMat4("projection", projection);
+        glm::mat3 invView = glm::inverse(glm::mat3(view));
+        objectShader.setMat3("invView", invView);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
@@ -340,6 +373,8 @@ void Render::renderLoop() {
         
         object.draw(objectShader, 1);
         
+        glEnable(GL_CULL_FACE);
+        
         
         // ------------------------------------
         // render skybox as background
@@ -347,16 +382,14 @@ void Render::renderLoop() {
         // render this after all oblique objects are rendered
         // a trick: set depth to be 1.0 by setting gl_Position.zw to 1.0
         //          and depth function to GL_LEQUAL, so that skybox lays
-        //          right on maximum depth
+        //          right on maximum depth (can either set gl_FragDepth
+        //          to 1.0 in fragment shader, however, in that case OpenGL
+        //          cannot do early depth testing any more)
         glDepthFunc(GL_LEQUAL);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
         skyboxShader.use();
         skyboxShader.setInt("skybox", 0);
-        // ignore translation, so that camera never moves relative to skybox
-        glm::mat4 skyboxView = glm::mat4(glm::mat3(view));
-        skyboxShader.setMat4("view", skyboxView);
-        skyboxShader.setMat4("projection", projection);
         skybox.draw(skyboxShader);
         glDepthFunc(GL_LESS);
         
@@ -368,8 +401,6 @@ void Render::renderLoop() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, glassTex);
         glassShader.use();
-        glassShader.setMat4("view", view);
-        glassShader.setMat4("projection", projection);
         glassShader.setInt("texture1", 0);
         glass.draw(glassShader);
         
@@ -397,5 +428,13 @@ void Render::renderLoop() {
         
         glfwSwapBuffers(window); // use color buffer to draw
         glfwPollEvents(); // check events (keyboard, mouse, ...)
+        
+        ++frameCount;
+        double currentTime = glfwGetTime();
+        if (currentTime - lastTime > 1.0) {
+            std::cout <<  "FPS: " << std::to_string(frameCount) << std::endl;
+            frameCount = 0;
+            lastTime = currentTime;
+        }
     }
 }

@@ -68,6 +68,7 @@
 		BDA7AC7D20598F6A0051122B /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
 		BDA7AC7F20598F6A0051122B /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
 		BDA7AC8120598F6A0051122B /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
+		BDE759B6207146C400FABBB5 /* shader_object.gs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.gs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +161,7 @@
 				BD5E920B206DBADB00635CBC /* shader_glass.vs */,
 				BD5E920C206DBAE500635CBC /* shader_glass.fs */,
 				BD617C81205BDC9200DBBAAA /* shader_object.vs */,
+				BDE759B6207146C400FABBB5 /* shader_object.gs */,
 				BD617C82205BDCA200DBBAAA /* shader_object.fs */,
 				BD349940206EA4F900429E58 /* shader_screen.vs */,
 				BD349941206EA50100429E58 /* shader_screen.fs */,
