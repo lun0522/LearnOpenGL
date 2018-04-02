@@ -104,6 +104,13 @@ directory(texPath), gamma(gammaCorrection) {
 }
 
 void Model::draw(const Shader& shader, const GLuint texOffset) const {
+    shader.use();
     for (int i = 0; i < meshes.size(); ++i)
         meshes[i].draw(shader, texOffset);
+}
+
+void Model::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset) const {
+    shader.use();
+    for (int i = 0; i < meshes.size(); ++i)
+        meshes[i].drawInstanced(shader, amount, texOffset);
 }

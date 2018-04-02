@@ -20,6 +20,10 @@
 #include "render.hpp"
 
 using std::string;
+using glm::vec3;
+using glm::vec4;
+using glm::mat3;
+using glm::mat4;
 
 typedef struct ScreenSize {
     int width;
@@ -29,8 +33,9 @@ typedef struct ScreenSize {
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int NUM_POINT_LIGHTS = 3;
+const int NUM_ASTEROID = 750;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+Camera camera(vec3(0.0f, 0.0f, 10.0f));
 float lastFrame = 0.0f;
 float explosion = 0.0f;
 ScreenSize originalSize{0, 0};
@@ -134,6 +139,10 @@ void Render::renderLoop() {
                         path + "shaders/shader_skybox.fs");
     Shader screenShader(path + "shaders/shader_screen.vs",
                         path + "shaders/shader_screen.fs");
+    Shader planetShader(path + "shaders/shader_planet.vs",
+                        path + "shaders/shader_planet.fs");
+    Shader asteroidShader(path + "shaders/shader_asteroid.vs",
+                          path + "shaders/shader_planet.fs");
     
     
     // ------------------------------------
@@ -144,6 +153,8 @@ void Render::renderLoop() {
     Model skybox(path + "texture/skybox.obj");
     Model screen(path + "texture/screen.obj");
     Model object(path + "texture/nanosuit/nanosuit.obj", path + "texture/nanosuit");
+    Model planet(path + "texture/planet/planet.obj", path + "texture/planet");
+    Model asteroid(path + "texture/rock/rock.obj", path + "texture/rock");
     
     std::vector<string> boxfaces {
         "right.tga",
@@ -197,47 +208,99 @@ void Render::renderLoop() {
     GLuint uboMatrices; // used to store view and projection matrices
     glGenBuffers(1, &uboMatrices);
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW); // no data yet
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(mat4), NULL, GL_DYNAMIC_DRAW); // no data yet
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboMatrices); // or use glBindBufferRange for flexibility
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
-    std::vector<Shader> shaders {
+    for (Shader& shader : std::vector<Shader> {
         lampShader,
         glassShader,
         objectShader,
         skyboxShader,
-    };
-    for (Shader& shader: shaders) {
+        planetShader,
+        asteroidShader,
+    }) {
         shader.use();
         shader.setBlock("Matrices", 0);
     }
     
-    glm::mat4 objectModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 0.0f));
-    objectModel = glm::scale(objectModel, glm::vec3(1.0f) * 0.5f);
-    glm::mat4 glassModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
+    mat4 objectModel = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
+    objectModel = glm::scale(objectModel, vec3(1.0f) * 0.5f);
+    objectShader.use();
+    objectShader.setMat4("model", objectModel);
     
-    glm::vec3 lightColor(0.6f);
-    glm::vec3 ambientColor = lightColor * 0.2f;
-    glm::vec3 diffuseColor = lightColor * 0.8f;
+    mat4 glassModel = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 6.0f));
+    glassShader.use();
+    glassShader.setMat4("model", glassModel);
     
-    glm::vec3 lampPos[NUM_POINT_LIGHTS] = {
-        glm::vec3( 0.0f, -3.0f,  4.0f),
-        glm::vec3(-4.0f, -1.0f, -3.0f),
-        glm::vec3( 4.0f,  2.0f, -2.0f)
+    vec3 planetCenter(0.0f, 5.5f, -1.0f);
+    mat4 planetModel = glm::translate(glm::mat4(1.0f), planetCenter);
+    
+    std::vector<mat4> asteroidModels(NUM_ASTEROID);
+    srand(glfwGetTime()); // random seed
+    float radius = 5.0f, offset = 1.0f, displacement[3];
+    for (int i = 0; i < NUM_ASTEROID; ++i) {
+        for (int j = 0; j < 3; ++j)
+            displacement[j] = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        
+        mat4 model = glm::translate(mat4(1.0f), planetCenter);
+        
+        float theta = (float)i / NUM_ASTEROID * 360.0f;
+        float x = sin(theta) * radius + displacement[0];
+        float y = displacement[1] * 0.4f;
+        float z = cos(theta) * radius + displacement[2];
+        model = glm::translate(model, vec3(x, y, z)); // -offset ~ offset
+        
+        float angle = rand() % 360; // 0 ~ 360
+        model = glm::rotate(model, angle, vec3(0.4f, 0.6f, 0.8f));
+        
+        float scale = (rand() % 20) / 100.f + 0.05; // 0.05 ~ 0.25
+        model = glm::scale(model, vec3(scale * 0.25f));
+        
+        asteroidModels[i] = model;
+    }
+    
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, NUM_ASTEROID * sizeof(mat4), asteroidModels.data(), GL_STATIC_DRAW);
+    
+    auto func = []() {
+        for (int attrib = 3; attrib <= 6; ++attrib) {
+            // maximum amount of data allowed as a vertex attribute is equal to a vec4
+            // so state that there are 4 vec4s as a workaround
+            glVertexAttribPointer(attrib, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(vec4),
+                                  (void *)(sizeof(vec4) * (attrib - 3)));
+            glEnableVertexAttribArray(attrib);
+            // second parameter means to read next chunk of data after how many instances
+            // if stated as 1, model data gets updated only after one entire instance is drawn,
+            // rather than after each vertex
+            glVertexAttribDivisor(attrib, 1);
+        }
+    };
+    asteroid.appendData(func);
+    
+    vec3 lightColor(0.6f);
+    vec3 ambientColor = lightColor * 0.2f;
+    vec3 diffuseColor = lightColor * 0.8f;
+    
+    vec3 lampPos[NUM_POINT_LIGHTS] = {
+        vec3( 0.0f, -3.0f,  4.0f),
+        vec3(-4.0f, -1.0f, -3.0f),
+        vec3( 4.0f,  2.0f, -2.0f)
     };
     
-    glm::vec3 lampColor[NUM_POINT_LIGHTS] = {
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)
+    vec3 lampColor[NUM_POINT_LIGHTS] = {
+        vec3(1.0f, 0.0f, 0.0f),
+        vec3(0.0f, 1.0f, 0.0f),
+        vec3(0.0f, 0.0f, 1.0f)
     };
     
     objectShader.use();
-    objectShader.setMat4("model", objectModel);
     objectShader.setFloat("material.shininess", 0.2f);
     
     // directional light
-    glm::vec3 dirLight(0.0f, -1.0f, 1.0f);
+    vec3 dirLight(0.0f, -1.0f, 1.0f);
     objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
     objectShader.setVec3("dirLight.diffuse", ambientColor);
     objectShader.setVec3("dirLight.specular", lightColor);
@@ -248,9 +311,9 @@ void Render::renderLoop() {
         objectShader.setFloat(light + ".constant", 1.0f);
         objectShader.setFloat(light + ".linear", 0.09f);
         objectShader.setFloat(light + ".quadratic", 0.032f);
-        glm::vec3 ambient = ambientColor * lampColor[i];
-        glm::vec3 diffuse = diffuseColor * lampColor[i];
-        glm::vec3 specular = lightColor * lampColor[i];
+        vec3 ambient = ambientColor * lampColor[i];
+        vec3 diffuse = diffuseColor * lampColor[i];
+        vec3 specular = lightColor * lampColor[i];
         objectShader.setVec3(light + ".ambient", ambient);
         objectShader.setVec3(light + ".diffuse", diffuse);
         objectShader.setVec3(light + ".specular", specular);
@@ -267,9 +330,6 @@ void Render::renderLoop() {
     objectShader.setVec3("spotLight.ambient", ambientColor);
     objectShader.setVec3("spotLight.diffuse", diffuseColor);
     objectShader.setVec3("spotLight.specular", lightColor);
-    
-    glassShader.use();
-    glassShader.setMat4("model", glassModel);
     
     
     // ------------------------------------
@@ -307,11 +367,11 @@ void Render::renderLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         // set once, use anywhere
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = camera.getProjectionMatrix();
+        mat4 view = camera.getViewMatrix();
+        mat4 projection = camera.getProjectionMatrix();
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));
-        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), glm::value_ptr(view));
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), glm::value_ptr(projection));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
         
         
@@ -324,8 +384,8 @@ void Render::renderLoop() {
         
         lampShader.use();
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
-            glm::mat4 lampModel = glm::translate(glm::mat4(1.0f), lampPos[i]);
-            lampModel = glm::scale(lampModel, glm::vec3(0.8f));
+            mat4 lampModel = glm::translate(mat4(1.0f), lampPos[i]);
+            lampModel = glm::scale(lampModel, vec3(0.8f));
             lampShader.setMat4("model", lampModel);
             lampShader.setVec3("lightColor", lampColor[i]);
             lamp.draw(lampShader);
@@ -335,8 +395,8 @@ void Render::renderLoop() {
         glStencilMask(0x00); // disable updating stencil buffer (imagine when lamps overlap)
         
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
-            glm::mat4 lampModel = glm::translate(glm::mat4(1.0f), lampPos[i]);
-            lampModel = glm::scale(lampModel, glm::vec3(0.85f));
+            mat4 lampModel = glm::translate(mat4(1.0f), lampPos[i]);
+            lampModel = glm::scale(lampModel, vec3(0.85f));
             lampShader.setMat4("model", lampModel);
             lampShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
             lamp.draw(lampShader);
@@ -353,9 +413,9 @@ void Render::renderLoop() {
         
         objectShader.use();
         objectShader.setFloat("explosion", explosion);
-        glm::mat3 normal = glm::transpose(glm::inverse(glm::mat3(view * objectModel)));
+        mat3 normal = glm::transpose(glm::inverse(mat3(view * objectModel)));
         objectShader.setMat3("normal", normal);
-        glm::mat3 invView = glm::inverse(glm::mat3(view));
+        mat3 invView = glm::inverse(glm::mat3(view));
         objectShader.setMat3("invView", invView);
         
         glActiveTexture(GL_TEXTURE0);
@@ -363,10 +423,10 @@ void Render::renderLoop() {
         objectShader.setInt("material.envMap", 0);
         
         // lights direction in camera space
-        glm::vec3 dirLightDir = glm::vec3(view * glm::vec4(dirLight, 0.0f));
+        vec3 dirLightDir = vec3(view * vec4(dirLight, 0.0f));
         objectShader.setVec3("dirLight.direction", dirLightDir);
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
-            glm::vec3 pointLightDir = glm::vec3(view * glm::vec4(lampPos[i], 1.0f));
+            vec3 pointLightDir = vec3(view * vec4(lampPos[i], 1.0f));
             objectShader.setVec3("pointLights[" + std::to_string(i) + "].position",
                                  pointLightDir);
         }
@@ -374,6 +434,16 @@ void Render::renderLoop() {
         object.draw(objectShader, 1);
         
         glEnable(GL_CULL_FACE);
+        
+        
+        // ------------------------------------
+        // render planet and asteroids
+        
+        planetShader.use();
+        planetModel = glm::rotate(planetModel, 0.01f, vec3(0.0f, 1.0f, 0.0f));
+        planetShader.setMat4("model", glm::scale(planetModel, vec3(0.5f)));
+        planet.draw(planetShader);
+        asteroid.drawInstanced(asteroidShader, NUM_ASTEROID);
         
         
         // ------------------------------------

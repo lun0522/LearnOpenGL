@@ -36,11 +36,19 @@ class Mesh {
     const std::vector<Vertex> vertices;
     const std::vector<GLuint> indices;
     const std::vector<Texture> textures;
+    void bindTexture(const Shader& shader, const GLuint texOffset) const;
 public:
     Mesh(const std::vector<Vertex>& vertices,
          const std::vector<GLuint>& indices,
          const std::vector<Texture>& textures);
     void draw(const Shader& shader, const GLuint texOffset) const;
+    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset) const;
+    template<typename Func>
+    void appendData(Func& func) const {
+        glBindVertexArray(VAO);
+        func();
+        glBindVertexArray(0);
+    }
 };
 
 #endif /* mesh_h */

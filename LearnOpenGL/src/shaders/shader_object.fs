@@ -60,8 +60,8 @@ uniform Material material;
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(normal, lightDir), 0.0); // for diffuse
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 halfDir = normalize(lightDir + viewDir); // Blinn-Phong shading
+    float spec = pow(max(dot(normal, halfDir), 0.0), material.shininess); // for specular
     
     vec3 ambient  = light.ambient  * texture(material.diffuse0, texCoord).rgb;
     vec3 diffuse  = light.diffuse  * diff * texture(material.diffuse0, texCoord).rgb;
@@ -73,8 +73,8 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0); // for diffuse
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); // for specular
+    vec3 halfDir = normalize(lightDir + viewDir); // Blinn-Phong shading
+    float spec = pow(max(dot(normal, halfDir), 0.0), material.shininess); // for specular
     
     // attenuation
     float lightDist = length(light.position - fragPos);
@@ -90,8 +90,8 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir) {
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0); // for diffuse
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); // for specular
+    vec3 halfDir = normalize(lightDir + viewDir); // Blinn-Phong shading
+    float spec = pow(max(dot(normal, halfDir), 0.0), material.shininess); // for specular
     
     // attenuation
     float lightDist = length(light.position - fragPos);

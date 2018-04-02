@@ -30,8 +30,13 @@ public:
     Model(const std::string& objPath,
           const std::string& texPath = "",
           const bool gammaCorrection = false);
-    void draw(const Shader& shader,
-              const GLuint texOffset = 0) const;
+    void draw(const Shader& shader, const GLuint texOffset = 0) const;
+    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset = 0) const;
+    template<typename Func>
+    void appendData(Func& func) const {
+        for (int i = 0; i < meshes.size(); ++i)
+        meshes[i].appendData(func);
+    }
 };
 
 #endif /* model_h */

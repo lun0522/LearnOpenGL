@@ -50,32 +50,40 @@ vertices(vertices), indices(indices), textures(textures) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::draw(const Shader& shader, const GLuint texOffset) const {
-    shader.use();
-    
+void Mesh::bindTexture(const Shader& shader, const GLuint texOffset) const {
     int diffIdx = 0, specIdx = 0, reflIdx = 0;
     for (int i = 0; i < textures.size(); ++i) {
         std::string name;
         switch (textures[i].type) {
             case DIFFUSE:
-                name = "material.diffuse" + std::to_string(diffIdx++);
-                break;
+            name = "material.diffuse" + std::to_string(diffIdx++);
+            break;
             case SPECULAR:
-                name = "material.specular" + std::to_string(specIdx++);
-                break;
+            name = "material.specular" + std::to_string(specIdx++);
+            break;
             case REFLECTION:
-                name = "material.reflection" + std::to_string(reflIdx++);
-                break;
+            name = "material.reflection" + std::to_string(reflIdx++);
+            break;
             default:
-                throw "Unknown texture type";
+            throw "Unknown texture type";
         }
         GLuint texIndex = texOffset + i;
         glActiveTexture(GL_TEXTURE0 + texIndex);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
         shader.setInt(name, texIndex);
     }
-    
+}
+
+void Mesh::draw(const Shader& shader, const GLuint texOffset) const {
+    bindTexture(shader, texOffset);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+void Mesh::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset) const {
+    bindTexture(shader, texOffset);
+    glBindVertexArray(VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, amount);
     glBindVertexArray(0);
 }
