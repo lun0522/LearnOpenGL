@@ -76,7 +76,7 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
         
         auto loaded = loadedTexture.find(filename);
         if (loaded == loadedTexture.end()) {
-            Texture texture = { Loader::loadTexture(directory + '/' + filename), type, filename };
+            Texture texture = { Loader::loadTexture(directory + '/' + filename, type == DIFFUSE), type, filename };
             textures.push_back(texture);
             loadedTexture.insert({ filename, texture });
         } else {
@@ -87,9 +87,8 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
 }
 
 Model::Model(const string& objPath,
-             const string& texPath,
-             const bool gammaCorrection):
-directory(texPath), gamma(gammaCorrection) {
+             const string& texPath):
+directory(texPath) {
     Assimp::Importer importer;
     // other useful options:
     // aiProcess_GenNormals: create normal for vertices
@@ -103,14 +102,14 @@ directory(texPath), gamma(gammaCorrection) {
     processNode(scene->mRootNode, scene);
 }
 
-void Model::draw(const Shader& shader, const GLuint texOffset) const {
+void Model::draw(const Shader& shader, const GLuint texOffset, const bool isCalcShadow) const {
     shader.use();
     for (int i = 0; i < meshes.size(); ++i)
-        meshes[i].draw(shader, texOffset);
+        meshes[i].draw(shader, texOffset, isCalcShadow);
 }
 
-void Model::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset) const {
+void Model::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset, const bool isCalcShadow) const {
     shader.use();
     for (int i = 0; i < meshes.size(); ++i)
-        meshes[i].drawInstanced(shader, amount, texOffset);
+        meshes[i].drawInstanced(shader, amount, texOffset, isCalcShadow);
 }

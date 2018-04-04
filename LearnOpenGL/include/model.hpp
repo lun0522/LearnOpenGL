@@ -17,7 +17,6 @@
 #include "mesh.hpp"
 
 class Model {
-    const bool gamma;
     std::string directory;
     std::vector<Mesh> meshes;
     std::unordered_map<std::string, Texture> loadedTexture;
@@ -28,10 +27,9 @@ class Model {
                                               const TextureType type);
 public:
     Model(const std::string& objPath,
-          const std::string& texPath = "",
-          const bool gammaCorrection = false);
-    void draw(const Shader& shader, const GLuint texOffset = 0) const;
-    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset = 0) const;
+          const std::string& texPath = "");
+    void draw(const Shader& shader, const GLuint texOffset = 0, const bool isCalcShadow = false) const;
+    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset = 0, const bool isCalcShadow = false) const;
     template<typename Func>
     void appendData(Func& func) const {
         for (int i = 0; i < meshes.size(); ++i)
@@ -39,4 +37,4 @@ public:
     }
 };
 
-#endif /* model_h */
+#endif /* model_hpp */

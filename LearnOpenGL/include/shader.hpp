@@ -31,4 +31,4 @@ public:
     void setBlock(const std::string& name, const GLuint bindingPoint) const;
 };
 
-#endif /* Shader_h */
+#endif /* shader_hpp */

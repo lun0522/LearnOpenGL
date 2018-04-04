@@ -15,7 +15,7 @@ enum CameraMoveDirection { UP, DOWN, LEFT, RIGHT };
 
 class Camera {
     glm::vec3 position, front, up, right;
-    glm::mat4 viewMatrix, projectionMatrix;
+    glm::mat4 view, projection;
     float fov, near, far, yaw, pitch, width, height, lastX, lastY, sensitivity;
     bool firstFrame;
     void updateRight();
@@ -39,4 +39,4 @@ public:
     const glm::mat4& getProjectionMatrix() const;
 };
 
-#endif /* camera_h */
+#endif /* camera_hpp */

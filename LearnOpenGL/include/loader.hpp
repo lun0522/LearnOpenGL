@@ -15,9 +15,8 @@
 
 class Loader {
 public:
-    static GLuint loadTexture(const std::string& path);
-    static GLuint loadCubemap(const std::string& path,
-                              const std::vector<std::string>& filename);
+    static GLuint loadTexture(const std::string& path, const bool gammaCorrection);
+    static GLuint loadCubemap(const std::string& path, const std::vector<std::string>& filename);
 };
 
 #endif /* loader_hpp */

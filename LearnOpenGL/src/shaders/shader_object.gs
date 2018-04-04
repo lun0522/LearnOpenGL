@@ -10,6 +10,7 @@ in VS_OUT {
     vec3 norm;
     vec3 fragPos;
     vec2 texCoord;
+    vec4 fragPosLightSpace;
 } gs_in[];
 
 // fragment shader only wants attributes of a single vertex
@@ -18,6 +19,7 @@ in VS_OUT {
 out vec3 norm;
 out vec3 fragPos;
 out vec2 texCoord;
+out vec4 fragPosLightSpace;
 
 uniform float explosion;
 layout (std140) uniform Matrices {
@@ -35,6 +37,7 @@ void explode(int index, vec3 movement) {
     norm = gs_in[index].norm;
     fragPos = gs_in[index].fragPos + movement;
     texCoord = gs_in[index].texCoord;
+    fragPosLightSpace = gs_in[index].fragPosLightSpace;
     gl_Position = projection * vec4(fragPos, 1.0);
     EmitVertex();
 }

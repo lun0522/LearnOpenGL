@@ -89,12 +89,12 @@ void Camera::processKeyboardInput(const CameraMoveDirection direction, const flo
 }
 
 const glm::mat4& Camera::getViewMatrix() const {
-    return viewMatrix;
+    return view;
 }
 
 const glm::mat4& Camera::getProjectionMatrix() const {
     if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
-    return projectionMatrix;
+    return projection;
 }
 
 void Camera::updateRight() {
@@ -103,9 +103,9 @@ void Camera::updateRight() {
 
 void Camera::updateProjectionMatrix() {
     if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
-    projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(fov), width / height, near, far);
 }
 
 void Camera::updateViewMatrix() {
-    viewMatrix = glm::lookAt(position, position + front, up);
+    view = glm::lookAt(position, position + front, up);
 }

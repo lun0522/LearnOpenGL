@@ -8,17 +8,21 @@ out VS_OUT {
     vec3 norm; // in view space
     vec3 fragPos; // in view space
     vec2 texCoord;
+    vec4 fragPosLightSpace;
 } vs_out;
 
 uniform mat3 normal;
 uniform mat4 model;
+uniform mat4 lightSpace;
 layout (std140) uniform Matrices {
     uniform mat4 view;
     uniform mat4 projection;
 };
 
 void main() {
-    vs_out.fragPos = vec3(view * model * vec4(aPos, 1.0));
+    vec4 fragPosWorldSpace = model * vec4(aPos, 1.0);
+    vs_out.fragPos = (view * fragPosWorldSpace).xyz;
+    vs_out.fragPosLightSpace = lightSpace * fragPosWorldSpace;
     gl_Position = projection * vec4(vs_out.fragPos, 1.0);
     vs_out.norm = normal * aNormal;
     vs_out.texCoord = aTexCoord;

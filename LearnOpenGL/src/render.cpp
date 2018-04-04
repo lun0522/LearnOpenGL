@@ -17,6 +17,7 @@
 #include "camera.hpp"
 #include "loader.hpp"
 #include "model.hpp"
+#include "shadow.hpp"
 #include "render.hpp"
 
 using std::string;
@@ -143,6 +144,8 @@ void Render::renderLoop() {
                         path + "shaders/shader_planet.fs");
     Shader asteroidShader(path + "shaders/shader_asteroid.vs",
                           path + "shaders/shader_planet.fs");
+    Shader dirShadowShader(path + "shaders/shader_shadow.vs",
+                           path + "shaders/shader_shadow.fs");
     
     
     // ------------------------------------
@@ -165,7 +168,13 @@ void Render::renderLoop() {
         "front.tga",
     };
     GLuint skyboxTex = Loader::loadCubemap(path + "texture/tidepool", boxfaces);
-    GLuint glassTex = Loader::loadTexture(path + "texture/glass.png");
+    GLuint glassTex = Loader::loadTexture(path + "texture/glass.png", true);
+    GLuint floorTex = Loader::loadTexture(path + "texture/floor.jpg", true);
+    GLuint blackTex = Loader::loadTexture(path + "texture/black.jpg", true);
+    
+    vec3 dirLight(1.0f, -1.0f, 1.0f);
+    Shadow dirLightShadow(currentSize.width, currentSize.height,
+                          vec3(0.0f) - dirLight * 20.0f, dirLight);
     
     
     // ------------------------------------
@@ -226,14 +235,16 @@ void Render::renderLoop() {
     
     mat4 objectModel = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
     objectModel = glm::scale(objectModel, vec3(1.0f) * 0.5f);
-    objectShader.use();
-    objectShader.setMat4("model", objectModel);
+    
+    mat4 floorModel = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
+    floorModel = glm::rotate(floorModel, glm::radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
+    floorModel = glm::scale(floorModel, vec3(1.0f) * 5.0f);
     
     mat4 glassModel = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 6.0f));
     glassShader.use();
     glassShader.setMat4("model", glassModel);
     
-    vec3 planetCenter(0.0f, 5.5f, -1.0f);
+    vec3 planetCenter(0.0f, 5.5f, 0.0f);
     mat4 planetModel = glm::translate(glm::mat4(1.0f), planetCenter);
     
     std::vector<mat4> asteroidModels(NUM_ASTEROID);
@@ -252,7 +263,7 @@ void Render::renderLoop() {
         model = glm::translate(model, vec3(x, y, z)); // -offset ~ offset
         
         float angle = rand() % 360; // 0 ~ 360
-        model = glm::rotate(model, angle, vec3(0.4f, 0.6f, 0.8f));
+        model = glm::rotate(model, glm::radians(angle), vec3(0.4f, 0.6f, 0.8f));
         
         float scale = (rand() % 20) / 100.f + 0.05; // 0.05 ~ 0.25
         model = glm::scale(model, vec3(scale * 0.25f));
@@ -280,9 +291,9 @@ void Render::renderLoop() {
     };
     asteroid.appendData(func);
     
-    vec3 lightColor(0.6f);
-    vec3 ambientColor = lightColor * 0.2f;
-    vec3 diffuseColor = lightColor * 0.8f;
+    vec3 lightColor(0.3f);
+    vec3 ambientColor = lightColor * 0.1f;
+    vec3 diffuseColor = lightColor * 0.6f;
     
     vec3 lampPos[NUM_POINT_LIGHTS] = {
         vec3( 0.0f, -3.0f,  4.0f),
@@ -300,20 +311,20 @@ void Render::renderLoop() {
     objectShader.setFloat("material.shininess", 0.2f);
     
     // directional light
-    vec3 dirLight(0.0f, -1.0f, 1.0f);
     objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
-    objectShader.setVec3("dirLight.diffuse", ambientColor);
-    objectShader.setVec3("dirLight.specular", lightColor);
+    objectShader.setVec3("dirLight.diffuse", diffuseColor);
+    objectShader.setVec3("dirLight.specular", ambientColor);
+    objectShader.setMat4("lightSpace", dirLightShadow.getLightSpaceMatrix());
     
     // point lights
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
         string light = "pointLights[" + std::to_string(i) + "]";
         objectShader.setFloat(light + ".constant", 1.0f);
-        objectShader.setFloat(light + ".linear", 0.09f);
-        objectShader.setFloat(light + ".quadratic", 0.032f);
-        vec3 ambient = ambientColor * lampColor[i];
-        vec3 diffuse = diffuseColor * lampColor[i];
-        vec3 specular = lightColor * lampColor[i];
+        objectShader.setFloat(light + ".linear", 0.1f);
+        objectShader.setFloat(light + ".quadratic", 0.002f);
+        vec3 ambient = ambientColor * lampColor[i] * 0.3f;
+        vec3 diffuse = diffuseColor * lampColor[i] * 0.3f;
+        vec3 specular = lightColor * lampColor[i] * 0.3f;
         objectShader.setVec3(light + ".ambient", ambient);
         objectShader.setVec3(light + ".diffuse", diffuse);
         objectShader.setVec3(light + ".specular", specular);
@@ -322,11 +333,11 @@ void Render::renderLoop() {
     // spot light
     objectShader.setVec3("spotLight.position", 0.0f, 0.0f, 0.0f);
     objectShader.setVec3("spotLight.direction", 0.0f, 0.0f, -1.0f);
-    objectShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-    objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+    objectShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(7.5f)));
+    objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(12.5f)));
     objectShader.setFloat("spotLight.constant", 1.0f);
-    objectShader.setFloat("spotLight.linear", 0.09f);
-    objectShader.setFloat("spotLight.quadratic", 0.032f);
+    objectShader.setFloat("spotLight.linear", 0.1f);
+    objectShader.setFloat("spotLight.quadratic", 0.002f);
     objectShader.setVec3("spotLight.ambient", ambientColor);
     objectShader.setVec3("spotLight.diffuse", diffuseColor);
     objectShader.setVec3("spotLight.specular", lightColor);
@@ -409,31 +420,61 @@ void Render::renderLoop() {
         // ------------------------------------
         // render object
         
-        glDisable(GL_CULL_FACE);
+        std::vector<Model> models {
+            object,
+            glass,
+        };
+        std::vector<mat4> modelMatrices {
+            objectModel,
+            floorModel,
+        };
+        dirLightShadow.calculate(dirShadowShader, models, modelMatrices,
+                                 originalSize.width, originalSize.height, framebuffer);
+        
+        glDisable(GL_CULL_FACE); // for explosion effect
         
         objectShader.use();
+        dirLightShadow.bindShadowMap(GL_TEXTURE0);
+        objectShader.setInt("depthMap", 0);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
+        objectShader.setInt("material.envMap", 1);
+        
         objectShader.setFloat("explosion", explosion);
         mat3 normal = glm::transpose(glm::inverse(mat3(view * objectModel)));
         objectShader.setMat3("normal", normal);
         mat3 invView = glm::inverse(glm::mat3(view));
         objectShader.setMat3("invView", invView);
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-        objectShader.setInt("material.envMap", 0);
-        
         // lights direction in camera space
         vec3 dirLightDir = vec3(view * vec4(dirLight, 0.0f));
         objectShader.setVec3("dirLight.direction", dirLightDir);
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             vec3 pointLightDir = vec3(view * vec4(lampPos[i], 1.0f));
-            objectShader.setVec3("pointLights[" + std::to_string(i) + "].position",
-                                 pointLightDir);
+            objectShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightDir);
         }
         
-        object.draw(objectShader, 1);
+        objectShader.setMat4("model", objectModel);
+        object.draw(objectShader, 2);
         
         glEnable(GL_CULL_FACE);
+        
+        // note! even if we don't need cudemap when render floor, material.cubemap
+        // still must have a value. if we bind floorTex to GL_TEXTURE1, material.cubemap
+        // will become unset, and floor will not get rendered!
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, floorTex);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, blackTex);
+        objectShader.setInt("material.diffuse0", 2);
+        objectShader.setInt("material.specular0", 3);
+        objectShader.setInt("material.reflection0", 3);
+        
+        normal = glm::transpose(glm::inverse(mat3(view * floorModel)));
+        objectShader.setMat3("normal", normal);
+        objectShader.setMat4("model", floorModel);
+        glass.draw(objectShader);
         
         
         // ------------------------------------

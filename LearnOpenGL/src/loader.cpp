@@ -14,20 +14,25 @@
 using std::vector;
 using std::string;
 
-GLuint loadImage(const string& path, GLenum target, bool shouldBind) {
+GLuint loadImage(const string& path,
+                 const GLenum target,
+                 const bool shouldBind,
+                 const bool gammaCorrection) {
     int width, height, channel;
     stbi_uc *data = stbi_load(path.c_str(), &width, &height, &channel, 0);
     if (!data) throw "Failed to load texture from " + path;
     
-    GLenum format;
+    GLenum internalFormat, format;
     switch (channel) {
         case 1:
-            format = GL_RED;
+            internalFormat = format = GL_RED;
             break;
         case 3:
+            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
             format = GL_RGB;
             break;
         case 4:
+            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
             format = GL_RGBA;
             break;
         default:
@@ -41,14 +46,14 @@ GLuint loadImage(const string& path, GLenum target, bool shouldBind) {
     }
     
     // texture target, minmap level, texture format, width, height, always 0, image format, dtype, data
-    glTexImage2D(target, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     
     stbi_image_free(data);
     return texture;
 }
 
-GLuint Loader::loadTexture(const string& path) {
-    GLuint texture = loadImage(path, GL_TEXTURE_2D, true);
+GLuint Loader::loadTexture(const string& path, const bool gammaCorrection) {
+    GLuint texture = loadImage(path, GL_TEXTURE_2D, true, gammaCorrection);
     
     glGenerateMipmap(GL_TEXTURE_2D); // automatically generate all required minmaps
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -67,7 +72,7 @@ GLuint Loader::loadCubemap(const string& path, const vector<string>& filename) {
     
     for (int i = 0; i < filename.size(); ++i) {
         string filepath = path + '/' + filename[i];
-        loadImage(filepath, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, false);
+        loadImage(filepath, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, false, true);
     }
     
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

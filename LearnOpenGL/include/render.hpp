@@ -20,4 +20,4 @@ public:
     void renderLoop();
 };
 
-#endif /* render_h */
+#endif /* render_hpp */
