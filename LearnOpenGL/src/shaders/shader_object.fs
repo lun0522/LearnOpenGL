@@ -68,9 +68,17 @@ uniform sampler2D spotLightDepthMap;
 float calcOmniShadow(vec3 lightPos, samplerCube depthMap, float frustumHeight) {
     vec3 fragToLight = fragPosWorldSpace.xyz - lightPos; // both in world space
     float curDepth = length(fragToLight);
-    float hitDepth = texture(depthMap, fragToLight).r;
-    hitDepth *= frustumHeight; // [0, 1] -> true depth
-    return curDepth - 0.02 > hitDepth ? 1.0 : 0.0;
+    float shadow = 0.0, bias = 0.2;
+    // move closer -> smaller radius -> sharper shadow
+    float radius = (1.0 + (curDepth / frustumHeight)) / 25.0;
+    for (int x = -1; x < 2; ++x)
+        for (int y = -1; y < 2; ++y)
+            for (int z = -1; z < 2; ++z) {
+                float hitDepth = texture(depthMap, fragToLight + vec3(x, y, z) * radius).r;
+                hitDepth *= frustumHeight; // [0, 1] -> true depth
+                shadow += curDepth - bias > hitDepth ? 1.0 : 0.0;
+            }
+    return shadow / 27.0;
 }
 
 float calcUniShadow(vec3 lightDir, vec3 normal, vec4 fragPosLightSpace, sampler2D depthMap) {
@@ -89,10 +97,11 @@ float calcUniShadow(vec3 lightDir, vec3 normal, vec4 fragPosLightSpace, sampler2
     // resolution of depth map is limited, so we retrieve depth of 9 neighbor pixels
     // and compute an average
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(depthMap, 0);
-    for (int i = -1; i < 2; ++i) {
-        for (int j = -1; j < 2; ++j) {
-            float hitDepth = texture(depthMap, lightSpaceCoord.xy + vec2(i, j) * texelSize).r;
+    // move closer -> smaller radius -> sharper shadow
+    vec2 radius = (1.0 + curDepth) / textureSize(depthMap, 0);
+    for (int x = -1; x < 2; ++x) {
+        for (int y = -1; y < 2; ++y) {
+            float hitDepth = texture(depthMap, lightSpaceCoord.xy + vec2(x, y) * radius).r;
             shadow += curDepth - bias > hitDepth ? 1.0 : 0.0;
         }
     }
@@ -175,10 +184,6 @@ void main() {
     outColor += calcSpotLight(spotLight, normal, viewDir, spotLightShadow);
     outColor = mix(outColor, calcReflection(normal, viewDir),
                    texture(material.reflection0, texCoord).r);
-    
-//    vec3 fragToLight = fragPosWorldSpace.xyz - pointLightsPos[1]; // both in world space
-//    float hitDepth = texture(pointLightDepthMaps[1], fragToLight).r;
-//    outColor = vec3(hitDepth / frustumHeights[1]);
     
     fragColor = vec4(outColor, 1.0);
 }

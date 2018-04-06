@@ -42,12 +42,9 @@ public:
 
 class OmniShadow : public Shadow {
     float frustumHeight;
-    std::vector<glm::mat4> lightSpace;
     std::vector<std::string> uniformNames;
     OmniShadow();
-    OmniShadow(const int width,
-               const int height,
-               const float frustumHeight,
+    OmniShadow(const float frustumHeight,
                const glm::mat4& projection,
                const std::string& vertPath,
                const std::string& geomPath,
@@ -57,12 +54,9 @@ public:
     static OmniShadow PointLightShadow(const std::string& vertPath,
                                        const std::string& geomPath,
                                        const std::string& fragPath,
-                                       const int width,
-                                       const int height,
                                        const float near = 0.1f,
                                        const float far = 100.0f);
     void moveLight(const glm::vec3& position);
-    const std::vector<glm::mat4>& getLightSpaceMatrices() const;
     void bindShadowMap(const GLuint index) const;
     float getFrustumHeight();
 };

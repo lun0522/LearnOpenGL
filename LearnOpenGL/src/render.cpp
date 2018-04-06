@@ -176,8 +176,7 @@ void Render::renderLoop() {
         pointLightShadows.
         push_back(OmniShadow::PointLightShadow(path + "shaders/shader_omnishadow.vs",
                                                path + "shaders/shader_omnishadow.gs",
-                                               path + "shaders/shader_omnishadow.fs",
-                                               currentSize.width, currentSize.height));
+                                               path + "shaders/shader_omnishadow.fs"));
     }
     
     vec3 dirLight(1.0f, -1.0f, 1.0f);
@@ -336,8 +335,8 @@ void Render::renderLoop() {
     
     // directional light
     objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
-    objectShader.setVec3("dirLight.diffuse", diffuseColor);
-    objectShader.setVec3("dirLight.specular", ambientColor);
+    objectShader.setVec3("dirLight.diffuse", diffuseColor * 0.5f);
+    objectShader.setVec3("dirLight.specular", ambientColor * 0.5f);
     
     // point lights
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
@@ -345,12 +344,12 @@ void Render::renderLoop() {
         objectShader.setFloat(light + ".constant", 1.0f);
         objectShader.setFloat(light + ".linear", 0.1f);
         objectShader.setFloat(light + ".quadratic", 0.002f);
-        vec3 ambient = ambientColor * lampColor[i] * 0.3f;
-        vec3 diffuse = diffuseColor * lampColor[i] * 0.3f;
-        vec3 specular = lightColor * lampColor[i] * 0.3f;
-        objectShader.setVec3(light + ".ambient", ambient);
-        objectShader.setVec3(light + ".diffuse", diffuse);
-        objectShader.setVec3(light + ".specular", specular);
+        vec3 ambient = ambientColor * lampColor[i];
+        vec3 diffuse = diffuseColor * lampColor[i];
+        vec3 specular = lightColor * lampColor[i];
+        objectShader.setVec3(light + ".ambient", ambient * 0.5f);
+        objectShader.setVec3(light + ".diffuse", diffuse * 0.5f);
+        objectShader.setVec3(light + ".specular", specular * 0.5f);
     }
     
     // spot light
@@ -361,9 +360,9 @@ void Render::renderLoop() {
     objectShader.setFloat("spotLight.constant", 1.0f);
     objectShader.setFloat("spotLight.linear", 0.1f);
     objectShader.setFloat("spotLight.quadratic", 0.002f);
-    objectShader.setVec3("spotLight.ambient", ambientColor);
-    objectShader.setVec3("spotLight.diffuse", diffuseColor);
-    objectShader.setVec3("spotLight.specular", lightColor);
+    objectShader.setVec3("spotLight.ambient", ambientColor * 0.5f);
+    objectShader.setVec3("spotLight.diffuse", diffuseColor * 0.5f);
+    objectShader.setVec3("spotLight.specular", lightColor * 0.5f);
     
     
     // ------------------------------------
@@ -495,11 +494,6 @@ void Render::renderLoop() {
         
         objectShader.setMat4("model", objectModel);
         object.draw(objectShader, 6);
-        
-//        GLenum err;
-//        while ((err = glGetError()) != GL_NO_ERROR) {
-//            std::cerr << "OpenGL error: " << err << std::endl;
-//        }
         
         glEnable(GL_CULL_FACE);
         
