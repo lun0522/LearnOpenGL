@@ -14,6 +14,7 @@
 
 using std::string;
 using std::vector;
+static std::unordered_map<string, Texture> loadedTexture;
 
 void Model::processNode(const aiNode *node, const aiScene *scene) {
     for (int i = 0; i < node->mNumMeshes; ++i) {
@@ -102,14 +103,14 @@ directory(texPath) {
     processNode(scene->mRootNode, scene);
 }
 
-void Model::draw(const Shader& shader, const GLuint texOffset, const bool isCalcShadow) const {
+void Model::draw(const Shader& shader, const GLuint texOffset, const bool loadTexture) const {
     shader.use();
     for (int i = 0; i < meshes.size(); ++i)
-        meshes[i].draw(shader, texOffset, isCalcShadow);
+        meshes[i].draw(shader, texOffset, loadTexture);
 }
 
-void Model::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset, const bool isCalcShadow) const {
+void Model::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset, const bool loadTexture) const {
     shader.use();
     for (int i = 0; i < meshes.size(); ++i)
-        meshes[i].drawInstanced(shader, amount, texOffset, isCalcShadow);
+        meshes[i].drawInstanced(shader, amount, texOffset, loadTexture);
 }

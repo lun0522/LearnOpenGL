@@ -10,9 +10,12 @@
 
 #include "camera.hpp"
 
-Camera::Camera(const glm::vec3& position,
-               const glm::vec3& front,
-               const glm::vec3& up,
+using glm::vec3;
+using glm::mat4;
+
+Camera::Camera(const vec3& position,
+               const vec3& front,
+               const vec3& up,
                const float fov,
                const float near,
                const float far,
@@ -53,7 +56,7 @@ void Camera::processMouseMove(const double xPos, const double yPos) {
     if (pitch > 89.0f) pitch = 89.0f;
     else if (pitch < -89.0f) pitch = -89.0f;
     
-    front = glm::vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
+    front = vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
                       sin(glm::radians(pitch)),
                       cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
     updateRight();
@@ -88,11 +91,19 @@ void Camera::processKeyboardInput(const CameraMoveDirection direction, const flo
     updateViewMatrix();
 }
 
-const glm::mat4& Camera::getViewMatrix() const {
+const glm::vec3& Camera::getPosition() const {
+    return position;
+}
+
+const glm::vec3& Camera::getDirection() const {
+    return front;
+}
+
+const mat4& Camera::getViewMatrix() const {
     return view;
 }
 
-const glm::mat4& Camera::getProjectionMatrix() const {
+const mat4& Camera::getProjectionMatrix() const {
     if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
     return projection;
 }

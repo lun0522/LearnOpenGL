@@ -21,6 +21,7 @@
 #include "render.hpp"
 
 using std::string;
+using std::vector;
 using glm::vec3;
 using glm::vec4;
 using glm::mat3;
@@ -144,8 +145,6 @@ void Render::renderLoop() {
                         path + "shaders/shader_planet.fs");
     Shader asteroidShader(path + "shaders/shader_asteroid.vs",
                           path + "shaders/shader_planet.fs");
-    Shader dirShadowShader(path + "shaders/shader_shadow.vs",
-                           path + "shaders/shader_shadow.fs");
     
     
     // ------------------------------------
@@ -172,9 +171,26 @@ void Render::renderLoop() {
     GLuint floorTex = Loader::loadTexture(path + "texture/floor.jpg", true);
     GLuint blackTex = Loader::loadTexture(path + "texture/black.jpg", true);
     
+    vector<OmniShadow> pointLightShadows;
+    for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
+        pointLightShadows.
+        push_back(OmniShadow::PointLightShadow(path + "shaders/shader_omnishadow.vs",
+                                               path + "shaders/shader_omnishadow.gs",
+                                               path + "shaders/shader_omnishadow.fs",
+                                               currentSize.width, currentSize.height));
+    }
+    
     vec3 dirLight(1.0f, -1.0f, 1.0f);
-    Shadow dirLightShadow(currentSize.width, currentSize.height,
-                          vec3(0.0f) - dirLight * 20.0f, dirLight);
+    UniShadow dirLightShadow = UniShadow::
+    DirLightShadow(path + "shaders/shader_unishadow.vs",
+                   path + "shaders/shader_unishadow.fs",
+                   currentSize.width, currentSize.height);
+    dirLightShadow.moveLight(vec3(0.0f) - dirLight * 20.0f, dirLight);
+    
+    UniShadow spotLightShadow = UniShadow::
+    SpotLightShadow(path + "shaders/shader_unishadow.vs",
+                    path + "shaders/shader_unishadow.fs",
+                    currentSize.width, currentSize.height);
     
     
     // ------------------------------------
@@ -291,30 +307,37 @@ void Render::renderLoop() {
     };
     asteroid.appendData(func);
     
-    vec3 lightColor(0.3f);
+    vec3 lightColor(0.4f);
     vec3 ambientColor = lightColor * 0.1f;
     vec3 diffuseColor = lightColor * 0.6f;
     
     vec3 lampPos[NUM_POINT_LIGHTS] = {
         vec3( 0.0f, -3.0f,  4.0f),
         vec3(-4.0f, -1.0f, -3.0f),
-        vec3( 4.0f,  2.0f, -2.0f)
+        vec3( 4.0f,  2.0f, -2.0f),
     };
+    for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
+        pointLightShadows[i].moveLight(lampPos[i]);
     
     vec3 lampColor[NUM_POINT_LIGHTS] = {
         vec3(1.0f, 0.0f, 0.0f),
         vec3(0.0f, 1.0f, 0.0f),
-        vec3(0.0f, 0.0f, 1.0f)
+        vec3(0.0f, 0.0f, 1.0f),
     };
     
     objectShader.use();
     objectShader.setFloat("material.shininess", 0.2f);
+    for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
+        string index = std::to_string(i);
+        objectShader.setFloat("frustumHeights[" + index + "]",
+                              pointLightShadows[i].getFrustumHeight());
+        objectShader.setVec3("pointLightsPos[" + index + "]", lampPos[i]);
+    }
     
     // directional light
     objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
     objectShader.setVec3("dirLight.diffuse", diffuseColor);
     objectShader.setVec3("dirLight.specular", ambientColor);
-    objectShader.setMat4("lightSpace", dirLightShadow.getLightSpaceMatrix());
     
     // point lights
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
@@ -428,18 +451,33 @@ void Render::renderLoop() {
             objectModel,
             floorModel,
         };
-        dirLightShadow.calculate(dirShadowShader, models, modelMatrices,
-                                 originalSize.width, originalSize.height, framebuffer);
+        
+        for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
+            pointLightShadows[i].calcShadow(originalSize.width, originalSize.height,
+                                            framebuffer, models, modelMatrices);
+        dirLightShadow.calcShadow(originalSize.width, originalSize.height,
+                                  framebuffer, models, modelMatrices);
+        spotLightShadow.moveLight(camera.getPosition(), camera.getDirection());
+        spotLightShadow.calcShadow(originalSize.width, originalSize.height,
+                                   framebuffer, models, modelMatrices);
         
         glDisable(GL_CULL_FACE); // for explosion effect
         
         objectShader.use();
-        dirLightShadow.bindShadowMap(GL_TEXTURE0);
-        objectShader.setInt("depthMap", 0);
+        for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
+            pointLightShadows[i].bindShadowMap(GL_TEXTURE0 + i);
+            objectShader.setInt("pointLightDepthMaps[" + std::to_string(i) + "]", i);
+        }
+        objectShader.setMat4("dirLightSpace", dirLightShadow.getLightSpaceMatrix());
+        dirLightShadow.bindShadowMap(GL_TEXTURE3);
+        objectShader.setInt("dirLightDepthMap", 3);
+        objectShader.setMat4("spotLightSpace", spotLightShadow.getLightSpaceMatrix());
+        spotLightShadow.bindShadowMap(GL_TEXTURE4);
+        objectShader.setInt("spotLightDepthMap", 4);
         
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-        objectShader.setInt("material.envMap", 1);
+        objectShader.setInt("material.envMap", 5);
         
         objectShader.setFloat("explosion", explosion);
         mat3 normal = glm::transpose(glm::inverse(mat3(view * objectModel)));
@@ -456,20 +494,25 @@ void Render::renderLoop() {
         }
         
         objectShader.setMat4("model", objectModel);
-        object.draw(objectShader, 2);
+        object.draw(objectShader, 6);
+        
+//        GLenum err;
+//        while ((err = glGetError()) != GL_NO_ERROR) {
+//            std::cerr << "OpenGL error: " << err << std::endl;
+//        }
         
         glEnable(GL_CULL_FACE);
         
         // note! even if we don't need cudemap when render floor, material.cubemap
         // still must have a value. if we bind floorTex to GL_TEXTURE1, material.cubemap
         // will become unset, and floor will not get rendered!
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, floorTex);
-        glActiveTexture(GL_TEXTURE3);
+        glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, blackTex);
-        objectShader.setInt("material.diffuse0", 2);
-        objectShader.setInt("material.specular0", 3);
-        objectShader.setInt("material.reflection0", 3);
+        objectShader.setInt("material.diffuse0", 6);
+        objectShader.setInt("material.specular0", 7);
+        objectShader.setInt("material.reflection0", 7);
         
         normal = glm::transpose(glm::inverse(mat3(view * floorModel)));
         objectShader.setMat3("normal", normal);

@@ -13,21 +13,29 @@
 #include "shader.hpp"
 
 using std::string;
+static std::unordered_map<string, string> loadedCode;
 
-string readCode(string path) {
-    using std::stringstream;
-    using std::ifstream;
-    
-    stringstream stream;
-    ifstream file(path);
-    file.exceptions(ifstream::failbit | ifstream::badbit);
-    if (!file.is_open()) throw "Cannot open file: " + path;
-    
-    try {
-        stream << file.rdbuf();
-        return stream.str();
-    } catch (ifstream::failure e) {
-        throw "Failed in reading file: " + e.code().message();
+string Shader::readCode(string path) {
+    auto loaded = loadedCode.find(path);
+    if (loaded == loadedCode.end()) {
+        using std::stringstream;
+        using std::ifstream;
+        
+        stringstream stream;
+        ifstream file(path);
+        file.exceptions(ifstream::failbit | ifstream::badbit);
+        if (!file.is_open()) throw "Cannot open file: " + path;
+        
+        try {
+            stream << file.rdbuf();
+            string code = stream.str();
+            loadedCode.insert({ path, code });
+            return code;
+        } catch (ifstream::failure e) {
+            throw "Failed in reading file: " + e.code().message();
+        }
+    } else {
+        return loaded->second;
     }
 }
 
@@ -91,7 +99,7 @@ Shader::Shader(const std::string& vertexPath,
     }
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    glDeleteShader(geometry);
+    if (!geometryPath.empty()) glDeleteShader(geometry);
 }
 
 void Shader::use() const {

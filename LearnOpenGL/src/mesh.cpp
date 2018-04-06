@@ -74,15 +74,15 @@ void Mesh::bindTexture(const Shader& shader, const GLuint texOffset) const {
     }
 }
 
-void Mesh::draw(const Shader& shader, const GLuint texOffset, const bool isCalcShadow) const {
-    if (!isCalcShadow) bindTexture(shader, texOffset);
+void Mesh::draw(const Shader& shader, const GLuint texOffset, const bool loadTexture) const {
+    if (loadTexture) bindTexture(shader, texOffset);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
-void Mesh::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset, const bool isCalcShadow) const {
-    if (!isCalcShadow) bindTexture(shader, texOffset);
+void Mesh::drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset, const bool loadTexture) const {
+    if (loadTexture) bindTexture(shader, texOffset);
     glBindVertexArray(VAO);
     glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, amount);
     glBindVertexArray(0);

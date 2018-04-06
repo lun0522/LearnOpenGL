@@ -35,6 +35,8 @@ public:
     void processMouseMove(const double xPos, const double yPos);
     void processMouseScroll(const double yOffset);
     void processKeyboardInput(const CameraMoveDirection direction, const float deltaTime);
+    const glm::vec3& getPosition() const;
+    const glm::vec3& getDirection() const;
     const glm::mat4& getViewMatrix() const;
     const glm::mat4& getProjectionMatrix() const;
 };

@@ -72,10 +72,13 @@
 		BDA7AC8120598F6A0051122B /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
 		BDB5A5C22073D71F004E7E1C /* shadow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shadow.cpp; sourceTree = "<group>"; };
 		BDB5A5C32073D71F004E7E1C /* shadow.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = shadow.hpp; sourceTree = "<group>"; };
-		BDB5A5C52073E6E0004E7E1C /* shader_shadow.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_shadow.vs; sourceTree = "<group>"; };
-		BDB5A5C62073E6EA004E7E1C /* shader_shadow.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_shadow.fs; sourceTree = "<group>"; };
+		BDB5A5C52073E6E0004E7E1C /* shader_unishadow.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_unishadow.vs; sourceTree = "<group>"; };
+		BDB5A5C62073E6EA004E7E1C /* shader_unishadow.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_unishadow.fs; sourceTree = "<group>"; };
 		BDB5A5C72073EC57004E7E1C /* shader_lamp.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_lamp.vs; sourceTree = "<group>"; };
 		BDB5A5C82073EC58004E7E1C /* shader_lamp.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_lamp.fs; sourceTree = "<group>"; };
+		BDB5A5C92076AD0A004E7E1C /* shader_omnishadow.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.vs; sourceTree = "<group>"; };
+		BDB5A5CA2076AD19004E7E1C /* shader_omnishadow.gs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.gs; sourceTree = "<group>"; };
+		BDB5A5CB2076AD29004E7E1C /* shader_omnishadow.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.fs; sourceTree = "<group>"; };
 		BDE759B6207146C400FABBB5 /* shader_object.gs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.gs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -180,8 +183,11 @@
 				BD3ED7CA207270960052CD5F /* shader_planet.vs */,
 				BD3ED7CB207270A00052CD5F /* shader_planet.fs */,
 				BD3ED7C8207267020052CD5F /* shader_asteroid.vs */,
-				BDB5A5C52073E6E0004E7E1C /* shader_shadow.vs */,
-				BDB5A5C62073E6EA004E7E1C /* shader_shadow.fs */,
+				BDB5A5C52073E6E0004E7E1C /* shader_unishadow.vs */,
+				BDB5A5C62073E6EA004E7E1C /* shader_unishadow.fs */,
+				BDB5A5C92076AD0A004E7E1C /* shader_omnishadow.vs */,
+				BDB5A5CA2076AD19004E7E1C /* shader_omnishadow.gs */,
+				BDB5A5CB2076AD29004E7E1C /* shader_omnishadow.fs */,
 			);
 			path = shaders;
 			sourceTree = "<group>";

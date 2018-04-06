@@ -19,7 +19,6 @@
 class Model {
     std::string directory;
     std::vector<Mesh> meshes;
-    std::unordered_map<std::string, Texture> loadedTexture;
     void processNode(const aiNode *node, const aiScene *scene);
     Mesh processMesh(const aiMesh *mesh, const aiScene *scene);
     std::vector<Texture> loadMaterialTextures(const aiMaterial *material,
@@ -28,8 +27,8 @@ class Model {
 public:
     Model(const std::string& objPath,
           const std::string& texPath = "");
-    void draw(const Shader& shader, const GLuint texOffset = 0, const bool isCalcShadow = false) const;
-    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset = 0, const bool isCalcShadow = false) const;
+    void draw(const Shader& shader, const GLuint texOffset = 0, const bool loadTexture = true) const;
+    void drawInstanced(const Shader& shader, const GLuint amount, const GLuint texOffset = 0, const bool loadTexture = true) const;
     template<typename Func>
     void appendData(Func& func) const {
         for (int i = 0; i < meshes.size(); ++i)
