@@ -43,13 +43,6 @@ float explosion = 0.0f;
 ScreenSize originalSize{0, 0};
 ScreenSize currentSize{0, 0};
 
-void updateScreenSize(GLFWwindow *window) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    currentSize.width = width;
-    currentSize.height = height;
-}
-
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     currentSize.width = width;
     currentSize.height = height;
@@ -61,7 +54,7 @@ void mouseMoveCallback(GLFWwindow *window, double xPos, double yPos) {
 }
 
 void mouseScrollCallback(GLFWwindow *window, double xPos, double yPos) {
-    camera.processMouseScroll(yPos);
+    camera.processMouseScroll(yPos, 1.0f, 60.0f);
 }
 
 void Render::processKeyboardInput() {
@@ -74,14 +67,15 @@ void Render::processKeyboardInput() {
         return;
     }
     
+    float distance = deltaTime * 5.0f;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera.processKeyboardInput(UP, deltaTime);
+        camera.processKeyboardInput(UP, distance);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera.processKeyboardInput(DOWN, deltaTime);
+        camera.processKeyboardInput(DOWN, distance);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.processKeyboardInput(LEFT, deltaTime);
+        camera.processKeyboardInput(LEFT, distance);
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.processKeyboardInput(RIGHT, deltaTime);
+        camera.processKeyboardInput(RIGHT, distance);
     if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
         explosion = std::max(0.0f, explosion - 0.1f);
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
@@ -119,7 +113,9 @@ Render::Render() {
     if (!gladLoadGL()) throw "Failed to init GLAD";
     
     // screen size is different from the input width and height on retina screen
-    updateScreenSize(window);
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    currentSize = { width, height };
     originalSize = currentSize;
     glViewport(0, 0, currentSize.width, currentSize.height); // specify render area
     camera.setScreenSize(currentSize.width, currentSize.height);
@@ -166,7 +162,7 @@ void Render::renderLoop() {
         "back.tga",
         "front.tga",
     };
-    GLuint skyboxTex = Loader::loadCubemap(path + "texture/tidepool", boxfaces);
+    GLuint skyboxTex = Loader::loadCubemap(path + "texture/tidepool", boxfaces, true);
     GLuint glassTex = Loader::loadTexture(path + "texture/glass.png", true);
     GLuint floorTex = Loader::loadTexture(path + "texture/floor.jpg", true);
     GLuint blackTex = Loader::loadTexture(path + "texture/black.jpg", true);

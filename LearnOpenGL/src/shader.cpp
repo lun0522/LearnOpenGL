@@ -8,11 +8,13 @@
 
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader.hpp"
 
 using std::string;
+
 static std::unordered_map<string, string> loadedCode;
 
 string Shader::readCode(string path) {
@@ -109,7 +111,7 @@ void Shader::use() const {
 GLuint Shader::getUniform(const string &name) const {
     GLint location = glGetUniformLocation(programId, name.c_str());
     if (location != GL_INVALID_INDEX) return location;
-    else throw string("Cannot find uniform " + name);
+    else throw "Cannot find uniform " + name;
 }
 
 void Shader::setInt(const string &name, const int value) const {

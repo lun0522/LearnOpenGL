@@ -11,12 +11,14 @@
 
 #include <vector>
 #include <string>
-#include <glad/include/glad/glad.h>
+#include <glad/glad.h>
 
 class Loader {
 public:
     static GLuint loadTexture(const std::string& path, const bool gammaCorrection);
-    static GLuint loadCubemap(const std::string& path, const std::vector<std::string>& filename);
+    static GLuint loadCubemap(const std::string& path,
+                              const std::vector<std::string>& filename,
+                              const bool gammaCorrection);
 };
 
 #endif /* loader_hpp */
