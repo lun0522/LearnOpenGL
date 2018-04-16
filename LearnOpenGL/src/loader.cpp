@@ -6,13 +6,61 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
+#include <unordered_map>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #include "loader.hpp"
 
 using std::vector;
 using std::string;
+using glm::vec2;
+
+static std::unordered_map<string, GLuint> loadedTexture;
+static std::unordered_map<char, Character> loadedCharacter;
+
+void loadCharLib() {
+    FT_Library lib;
+    if (FT_Init_FreeType(&lib)) throw "Failed to init FreeType library";
+    
+    FT_Face face;
+    if (FT_New_Face(lib, "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/texture/georgia.ttf", 0, &face)) throw "Failed to load font";
+    
+    FT_Set_Pixel_Sizes(face, 0, 48); // set width to 0 for auto adjustment
+    
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment for texture storage
+    for (int c = 0; c < 128; ++c) {
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) throw "Failed to load glyph";
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        Character ch = {
+            texture,
+            vec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            (GLuint) face->glyph->advance.x >> 6, // advance is number of 1/64 pixels
+        };
+        loadedCharacter.insert({ c, ch });
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    
+    FT_Done_Face(face);
+    FT_Done_FreeType(lib);
+}
+
+Character& Loader::loadCharacter(const char character) {
+    if (loadedCharacter.empty()) loadCharLib();
+    auto loaded = loadedCharacter.find(character);
+    if (loaded == loadedCharacter.end()) throw "Failed to retrieve character";
+    else return loaded->second;
+}
 
 GLuint loadImage(const string& path,
                  const GLenum target,
@@ -53,16 +101,22 @@ GLuint loadImage(const string& path,
 }
 
 GLuint Loader::loadTexture(const string& path, const bool gammaCorrection) {
-    GLuint texture = loadImage(path, GL_TEXTURE_2D, true, gammaCorrection);
-    
-    glGenerateMipmap(GL_TEXTURE_2D); // automatically generate all required minmaps
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return texture;
+    auto loaded = loadedTexture.find(path);
+    if (loaded == loadedTexture.end()) {
+        GLuint texture = loadImage(path, GL_TEXTURE_2D, true, gammaCorrection);
+        
+        glGenerateMipmap(GL_TEXTURE_2D); // automatically generate all required minmaps
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        loadedTexture.insert({ path, texture });
+        return texture;
+    } else {
+        return loaded->second;
+    }
 }
 
 GLuint Loader::loadCubemap(const string& path,

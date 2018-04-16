@@ -18,6 +18,7 @@
 #include "loader.hpp"
 #include "model.hpp"
 #include "shadow.hpp"
+#include "text.hpp"
 #include "render.hpp"
 
 using std::string;
@@ -126,6 +127,8 @@ void Render::renderLoop() {
     // shader program
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
+    Shader textShader(path + "shaders/shader_text.vs",
+                      path + "shaders/shader_text.fs");
     Shader lampShader(path + "shaders/shader_lamp.vs",
                       path + "shaders/shader_lamp.fs");
     Shader glassShader(path + "shaders/shader_glass.vs",
@@ -145,6 +148,9 @@ void Render::renderLoop() {
     
     // ------------------------------------
     // models
+    
+    Text text;
+    vec3 textColor(0.0f);
     
     Model lamp(path + "texture/cube.obj");
     Model glass(path + "texture/glass.obj");
@@ -364,7 +370,7 @@ void Render::renderLoop() {
     // ------------------------------------
     // draw
     
-    int frameCount = 0;
+    int frameCount = 0, FPS = 0;
     double lastTime = glfwGetTime();
     
     while (!glfwWindowShouldClose(window)) { // until user hit close
@@ -539,7 +545,7 @@ void Render::renderLoop() {
         
         
         // ------------------------------------
-        // render semi-transparent glass
+        // render semi-transparent glass and text
         
         // render this at last because of alpha blending
         glActiveTexture(GL_TEXTURE0);
@@ -547,6 +553,9 @@ void Render::renderLoop() {
         glassShader.use();
         glassShader.setInt("texture1", 0);
         glass.draw(glassShader);
+        
+        text.renderText(textShader, "FPS: " + std::to_string(FPS),
+                        -0.95f, 0.9f, 1.0f / 1000.0f, textColor);
         
         
         // ------------------------------------
@@ -576,7 +585,7 @@ void Render::renderLoop() {
         ++frameCount;
         double currentTime = glfwGetTime();
         if (currentTime - lastTime > 1.0) {
-            std::cout <<  "FPS: " << std::to_string(frameCount) << std::endl;
+            FPS = frameCount;
             frameCount = 0;
             lastTime = currentTime;
         }

@@ -6,7 +6,6 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
-#include <unordered_map>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
@@ -15,8 +14,6 @@
 
 using std::string;
 using std::vector;
-
-static std::unordered_map<string, Texture> loadedTexture;
 
 void Model::processNode(const aiNode *node, const aiScene *scene) {
     for (int i = 0; i < node->mNumMeshes; ++i) {
@@ -73,16 +70,9 @@ vector<Texture> Model::loadMaterialTextures(const aiMaterial *material,
     for (int i = 0; i < material->GetTextureCount(aiType); ++i) {
         aiString path;
         material->GetTexture(aiType, i, &path);
-        string filename(path.C_Str());
-        
-        auto loaded = loadedTexture.find(filename);
-        if (loaded == loadedTexture.end()) {
-            Texture texture = { Loader::loadTexture(directory + '/' + filename, type == DIFFUSE), type, filename };
-            textures.push_back(texture);
-            loadedTexture.insert({ filename, texture });
-        } else {
-            textures.push_back(loaded->second);
-        }
+        string pathString = path.C_Str();
+        GLuint texture = Loader::loadTexture(directory + '/' + pathString, type == DIFFUSE);
+        textures.push_back({ texture, type });
     }
     return textures;
 }

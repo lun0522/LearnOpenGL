@@ -18,16 +18,15 @@
 
 enum TextureType { DIFFUSE, SPECULAR, REFLECTION };
 
+struct Texture {
+    GLuint id;
+    TextureType type;
+};
+
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoord;
-};
-
-struct Texture {
-    GLuint id;
-    TextureType type;
-    std::string path;
 };
 
 class Mesh {
