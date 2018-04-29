@@ -38,7 +38,7 @@ void Text::renderText(const Shader& shader,
     glBindVertexArray(VAO);
 
     for (auto c = text.begin(); c != text.end(); ++c) {
-        Character ch = Loader::loadCharacter(*c);
+        Loader::Character ch = Loader::loadCharacter(*c);
         
         float xPos = x + ch.bearing.x * scale;
         float yPos = y - (ch.size.y - ch.bearing.y) * scale;

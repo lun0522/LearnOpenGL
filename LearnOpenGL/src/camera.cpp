@@ -50,7 +50,7 @@ void Camera::processMouseMove(const double xPos, const double yPos) {
     lastY = yPos;
     
     yaw += xOffset;
-    if (yaw >= 360.0f) yaw -= 360.0f;
+    yaw = glm::mod(yaw, 360.0f);
     
     pitch += yOffset;
     if (pitch > 89.0f) pitch = 89.0f;
