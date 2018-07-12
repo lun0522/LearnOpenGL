@@ -46,8 +46,11 @@
 		BD0117EA2084219F00069899 /* shader_text.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_text.fs; sourceTree = "<group>"; };
 		BD0117EB20842DF700069899 /* text.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = text.cpp; sourceTree = "<group>"; };
 		BD0117EC20842DF700069899 /* text.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = text.hpp; sourceTree = "<group>"; };
+		BD09F3CC20F5CF590080BEA1 /* shader_hdr.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_hdr.fs; sourceTree = "<group>"; };
 		BD145FB9206F373B0068A587 /* shader_skybox.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_skybox.vs; sourceTree = "<group>"; };
 		BD145FBA206F37460068A587 /* shader_skybox.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_skybox.fs; sourceTree = "<group>"; };
+		BD180FB820F6F64000BA60F7 /* shader_gaussian.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_gaussian.fs; sourceTree = "<group>"; };
+		BD180FB920F7068D00BA60F7 /* shader_blend.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_blend.fs; sourceTree = "<group>"; };
 		BD349940206EA4F900429E58 /* shader_screen.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.vs; sourceTree = "<group>"; };
 		BD349941206EA50100429E58 /* shader_screen.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.fs; sourceTree = "<group>"; };
 		BD3E65352055C1D700B22D12 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -193,6 +196,9 @@
 				BD617C82205BDCA200DBBAAA /* shader_object.fs */,
 				BD349940206EA4F900429E58 /* shader_screen.vs */,
 				BD349941206EA50100429E58 /* shader_screen.fs */,
+				BD09F3CC20F5CF590080BEA1 /* shader_hdr.fs */,
+				BD180FB920F7068D00BA60F7 /* shader_blend.fs */,
+				BD180FB820F6F64000BA60F7 /* shader_gaussian.fs */,
 				BD145FB9206F373B0068A587 /* shader_skybox.vs */,
 				BD145FBA206F37460068A587 /* shader_skybox.fs */,
 				BD3ED7CA207270960052CD5F /* shader_planet.vs */,

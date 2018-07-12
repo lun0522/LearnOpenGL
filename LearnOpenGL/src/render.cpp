@@ -127,10 +127,14 @@ void Render::renderLoop() {
     // shader program
     
     string path = "/Users/lun/Desktop/Code/LearnOpenGL/LearnOpenGL/src/";
+    Shader hdrShader(path + "shaders/shader_screen.vs",
+                     path + "shaders/shader_hdr.fs");
     Shader textShader(path + "shaders/shader_text.vs",
                       path + "shaders/shader_text.fs");
     Shader lampShader(path + "shaders/shader_lamp.vs",
                       path + "shaders/shader_lamp.fs");
+    Shader blendShader(path + "shaders/shader_screen.vs",
+                       path + "shaders/shader_blend.fs");
     Shader glassShader(path + "shaders/shader_glass.vs",
                        path + "shaders/shader_glass.fs");
     Shader objectShader(path + "shaders/shader_object.vs",
@@ -144,6 +148,8 @@ void Render::renderLoop() {
                         path + "shaders/shader_planet.fs");
     Shader asteroidShader(path + "shaders/shader_asteroid.vs",
                           path + "shaders/shader_planet.fs");
+    Shader gaussianShader(path + "shaders/shader_screen.vs",
+                          path + "shaders/shader_gaussian.fs");
     
     
     // ------------------------------------
@@ -160,7 +166,7 @@ void Render::renderLoop() {
     Model planet(path + "texture/planet/planet.obj", path + "texture/planet");
     Model asteroid(path + "texture/rock/rock.obj", path + "texture/rock");
     
-    std::vector<string> boxfaces {
+    vector<string> boxfaces {
         "right.tga",
         "left.tga",
         "top.tga",
@@ -197,20 +203,35 @@ void Render::renderLoop() {
     // ------------------------------------
     // extra framebuffer
     
-    // framebuffer holds color, depth (optinal) and stencil (option) buffer
+    // framebuffer holds color, depth (optinal) and stencil (optional) buffer
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     
-    // framebuffer should have at least one color attachment (can have multiple)
-    GLuint texColorBuffer;
-    glGenTextures(1, &texColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, currentSize.width, currentSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // data is set to NULL, because later contents will be rendered to it
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // no need for mipmap
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // framebuffer should have at least one color attachment
+    // use GL_RGB16F to store HDR render results
+    // colorBuffers[0] for all fragments, colorBuffers[1] only for highlights
+    // colorBuffers[2] and colorBuffers[3] are ping-pong buffers
+    GLuint colorBuffers[4];
+    glGenTextures(4, colorBuffers);
+    for (int i = 0; i < 4; ++i) {
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, originalSize.width, originalSize.height, 0, GL_RGB, GL_FLOAT, NULL); // data is set to NULL, because later contents will be rendered to it
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // no need for mipmap
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
+                               GL_TEXTURE_2D, colorBuffers[i], 0);
+    }
+    // later we have to specify which color buffer(s) to render to
+    GLuint attachments[4] = {
+        GL_COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2,
+        GL_COLOR_ATTACHMENT3,
+    };
     glBindTexture(GL_TEXTURE_2D, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
     
     // render buffer is preferred when we don't need to sample data (depth/stencil)
     // otherwise we use texture (color)
@@ -238,7 +259,7 @@ void Render::renderLoop() {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboMatrices); // or use glBindBufferRange for flexibility
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
-    for (Shader& shader : std::vector<Shader> {
+    for (Shader& shader : vector<Shader> {
         lampShader,
         glassShader,
         objectShader,
@@ -264,7 +285,7 @@ void Render::renderLoop() {
     vec3 planetCenter(0.0f, 5.5f, 0.0f);
     mat4 planetModel = glm::translate(glm::mat4(1.0f), planetCenter);
     
-    std::vector<mat4> asteroidModels(NUM_ASTEROID);
+    vector<mat4> asteroidModels(NUM_ASTEROID);
     srand(glfwGetTime()); // random seed
     float radius = 5.0f, offset = 1.0f, displacement[3];
     for (int i = 0; i < NUM_ASTEROID; ++i) {
@@ -376,7 +397,7 @@ void Render::renderLoop() {
     while (!glfwWindowShouldClose(window)) { // until user hit close
         // render to texture of customized framebuffer first
         // later use this texture for default framebuffer
-        // always render in orignal size, let customized framebuffer deal with resizing
+        // always render in orignal size, let default framebuffer deal with resizing
         processKeyboardInput();
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, originalSize.width, originalSize.height);
@@ -413,9 +434,10 @@ void Render::renderLoop() {
         // ------------------------------------
         // render lamps with outlines
         
-        // enable any of ragments of lights (lamps) to update stencil buffer with 1
+        // enable any of fragments of lights (lamps) to update stencil buffer with 1
         // so that later we know where we should not draw outlines
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // let stencil test always pass
+        glStencilMask(0xFF);
         
         lampShader.use();
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
@@ -427,13 +449,12 @@ void Render::renderLoop() {
         }
         
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00); // disable updating stencil buffer (imagine when lamps overlap)
         
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             mat4 lampModel = glm::translate(mat4(1.0f), lampPos[i]);
             lampModel = glm::scale(lampModel, vec3(0.85f));
             lampShader.setMat4("model", lampModel);
-            lampShader.setVec3("lightColor", 1.0f, 1.0f, 0.0f);
+            lampShader.setVec3("lightColor", 5.0f, 5.0f, 0.0f);
             lamp.draw(lampShader);
         }
         
@@ -444,11 +465,11 @@ void Render::renderLoop() {
         // ------------------------------------
         // render object
         
-        std::vector<Model> models {
+        vector<Model> models {
             object,
             glass,
         };
-        std::vector<mat4> modelMatrices {
+        vector<mat4> modelMatrices {
             objectModel,
             floorModel,
         };
@@ -559,17 +580,60 @@ void Render::renderLoop() {
         
         
         // ------------------------------------
-        // switch back to default framebuffer
-        
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // render highlights to another texture
+        // and then switch back to default framebuffer
         
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_STENCIL_TEST);
         glDisable(GL_BLEND);
         
+        // render highlights from colorBuffers[0] to colorBuffers[1]
+        glDrawBuffers(1, &attachments[1]);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        hdrShader.use();
+        hdrShader.setInt("texture1", 0);
+        screen.draw(hdrShader);
+        
+        // blur highlights in colorBuffers[1]
+        // ping-pong between colorBuffers[2] and colorBuffers[3]
+        // and finally store in colorBuffers[3]
+        gaussianShader.use();
+        gaussianShader.setInt("texture1", 0);
+        glActiveTexture(GL_TEXTURE0);
+        for (int i = 0; i < 5; ++i) {
+            gaussianShader.setInt("horizontal", 1);
+            glDrawBuffers(1, &attachments[2]);
+            if (i == 0) glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
+            else        glBindTexture(GL_TEXTURE_2D, colorBuffers[3]);
+            screen.draw(gaussianShader);
+
+            gaussianShader.setInt("horizontal", 0);
+            glDrawBuffers(1, &attachments[3]);
+            glBindTexture(GL_TEXTURE_2D, colorBuffers[2]);
+            screen.draw(gaussianShader);
+        }
+        
+        // blend original scene (0) with blurred highlights (3)
+        // store result in colorBuffers[1]
+        glDrawBuffers(1, &attachments[1]);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[3]);
+        blendShader.use();
+        blendShader.setFloat("exposure", 0.8f);
+        blendShader.setInt("scene", 0);
+        blendShader.setInt("bloom", 1);
+        screen.draw(blendShader);
+        
+        glDrawBuffers(1, &attachments[0]);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        // render to default framebuffer
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
         screenShader.use();
         screenShader.setInt("texture1", 0);
         
