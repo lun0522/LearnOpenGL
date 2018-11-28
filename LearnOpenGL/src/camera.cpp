@@ -57,8 +57,8 @@ void Camera::processMouseMove(const double xPos, const double yPos) {
     else if (pitch < -89.0f) pitch = -89.0f;
     
     front = vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
-                      sin(glm::radians(pitch)),
-                      cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
+                 sin(glm::radians(pitch)),
+                 cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
     updateRight();
     updateViewMatrix();
 }

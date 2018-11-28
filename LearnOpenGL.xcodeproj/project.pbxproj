@@ -8,36 +8,37 @@
 
 /* Begin PBXBuildFile section */
 		BD0117ED20842DF700069899 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0117EB20842DF700069899 /* text.cpp */; };
-		BD0AAEFA2050D577006F668E /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; };
-		BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		BD426EC120656C1600EE7ACA /* model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD426EC020656C1600EE7ACA /* model.cpp */; };
 		BD46AA81206FC6FD0042A0C0 /* loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD46AA7F206FC6FD0042A0C0 /* loader.cpp */; };
 		BD4F031F2053076200758FD3 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD4F031E2053076200758FD3 /* shader.cpp */; };
-		BD50D0412082436A004F2734 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; };
-		BD50D04220824374004F2734 /* libfreetype.6.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		BD5B70D42063F4C1001CFEF8 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD5B70D32063F4C1001CFEF8 /* mesh.cpp */; };
 		BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB12050659D00DA8EFF /* OpenGL.framework */; };
 		BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD7DDDBF20506B0300DA8EFF /* main.cpp */; };
-		BD9042732065C7EE00827029 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
 		BD915570207866A600D7C7DF /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BD91556F207866A600D7C7DF /* glad.c */; };
 		BD9252502058B89100F6779C /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cpp */; };
 		BD9252532058C76500F6779C /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cpp */; };
+		BDA56D7D21ADA0DA00A4B992 /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; };
+		BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
+		BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; };
 		BDB5A5C42073D71F004E7E1C /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDB5A5C22073D71F004E7E1C /* shadow.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BD7DDDA420505BC600DA8EFF /* CopyFiles */ = {
+		BD7DDDA420505BC600DA8EFF /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BD50D04220824374004F2734 /* libfreetype.6.dylib in CopyFiles */,
-				BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in CopyFiles */,
-				BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in CopyFiles */,
+				BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */,
+				BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */,
+				BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in Copy Files */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -101,9 +102,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BD50D0412082436A004F2734 /* libfreetype.6.dylib in Frameworks */,
-				BD9042732065C7EE00827029 /* libassimp.4.1.0.dylib in Frameworks */,
-				BD0AAEFA2050D577006F668E /* libglfw.3.2.dylib in Frameworks */,
+				BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */,
+				BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */,
+				BDA56D7D21ADA0DA00A4B992 /* libglfw.3.2.dylib in Frameworks */,
 				BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -275,7 +276,7 @@
 			buildPhases = (
 				BD7DDDA220505BC600DA8EFF /* Sources */,
 				BD7DDDA320505BC600DA8EFF /* Frameworks */,
-				BD7DDDA420505BC600DA8EFF /* CopyFiles */,
+				BD7DDDA420505BC600DA8EFF /* Copy Files */,
 			);
 			buildRules = (
 			);
@@ -452,15 +453,15 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DXJ7AC4744;
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
+					/usr/local/lib,
 					/usr/local/Cellar/glfw/3.2.1/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
 					/usr/local/Cellar/freetype/2.9/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/Cellar/freetype/2.9/include/freetype2";
+				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
 			};
 			name = Debug;
 		};
@@ -470,15 +471,15 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DXJ7AC4744;
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
+					/usr/local/lib,
 					/usr/local/Cellar/glfw/3.2.1/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
 					/usr/local/Cellar/freetype/2.9/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/Cellar/freetype/2.9/include/freetype2";
+				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
 			};
 			name = Release;
 		};
