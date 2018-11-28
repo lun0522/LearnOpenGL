@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		BD0117ED20842DF700069899 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0117EB20842DF700069899 /* text.cpp */; };
-		BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD34960721AF409700F4C000 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; };
+		BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		BD426EC120656C1600EE7ACA /* model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD426EC020656C1600EE7ACA /* model.cpp */; };
 		BD46AA81206FC6FD0042A0C0 /* loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD46AA7F206FC6FD0042A0C0 /* loader.cpp */; };
 		BD4F031F2053076200758FD3 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD4F031E2053076200758FD3 /* shader.cpp */; };
@@ -20,7 +21,6 @@
 		BD915570207866A600D7C7DF /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BD91556F207866A600D7C7DF /* glad.c */; };
 		BD9252502058B89100F6779C /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cpp */; };
 		BD9252532058C76500F6779C /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cpp */; };
-		BDA56D7D21ADA0DA00A4B992 /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */; };
 		BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
 		BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; };
 		BDB5A5C42073D71F004E7E1C /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDB5A5C22073D71F004E7E1C /* shadow.cpp */; };
@@ -33,9 +33,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */,
 				BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */,
 				BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */,
-				BD0AAEFB2050D57F006F668E /* libglfw.3.2.dylib in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,10 +52,9 @@
 		BD145FBA206F37460068A587 /* shader_skybox.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_skybox.fs; sourceTree = "<group>"; };
 		BD180FB820F6F64000BA60F7 /* shader_gaussian.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_gaussian.fs; sourceTree = "<group>"; };
 		BD180FB920F7068D00BA60F7 /* shader_blend.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_blend.fs; sourceTree = "<group>"; };
+		BD34960621AF409700F4C000 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = "../../../../../usr/local/Cellar/glfw/HEAD-bb2ca1d/lib/libglfw.3.3.dylib"; sourceTree = "<group>"; };
 		BD349940206EA4F900429E58 /* shader_screen.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.vs; sourceTree = "<group>"; };
 		BD349941206EA50100429E58 /* shader_screen.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_screen.fs; sourceTree = "<group>"; };
-		BD3E65352055C1D700B22D12 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		BD3E65372055C1EF00B22D12 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		BD3ED7C8207267020052CD5F /* shader_asteroid.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_asteroid.vs; sourceTree = "<group>"; };
 		BD3ED7CA207270960052CD5F /* shader_planet.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_planet.vs; sourceTree = "<group>"; };
 		BD3ED7CB207270A00052CD5F /* shader_planet.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_planet.fs; sourceTree = "<group>"; };
@@ -74,8 +73,6 @@
 		BD617C82205BDCA200DBBAAA /* shader_object.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.fs; sourceTree = "<group>"; };
 		BD7DDDA620505BC700DA8EFF /* LearnOpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LearnOpenGL; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD7DDDB12050659D00DA8EFF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.2.dylib; path = ../../../../../usr/local/Cellar/glfw/3.2.1/lib/libglfw.3.2.dylib; sourceTree = "<group>"; };
-		BD7DDDB6205068BE00DA8EFF /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		BD7DDDBF20506B0300DA8EFF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.4.1.0.dylib; path = ../../../../../usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib; sourceTree = "<group>"; };
 		BD91556B207866A600D7C7DF /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
@@ -102,9 +99,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD34960721AF409700F4C000 /* libglfw.3.3.dylib in Frameworks */,
 				BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */,
 				BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */,
-				BDA56D7D21ADA0DA00A4B992 /* libglfw.3.2.dylib in Frameworks */,
 				BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -142,12 +139,9 @@
 		BD7DDDB02050659D00DA8EFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BD34960621AF409700F4C000 /* libglfw.3.3.dylib */,
 				BD50D0402082436A004F2734 /* libfreetype.6.dylib */,
 				BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */,
-				BD3E65372055C1EF00B22D12 /* libstdc++.tbd */,
-				BD3E65352055C1D700B22D12 /* libc++.tbd */,
-				BD7DDDB6205068BE00DA8EFF /* libGLEW.2.1.0.dylib */,
-				BD7DDDB32050661000DA8EFF /* libglfw.3.2.dylib */,
 				BD7DDDB12050659D00DA8EFF /* OpenGL.framework */,
 			);
 			name = Frameworks;
@@ -456,9 +450,9 @@
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
-					/usr/local/Cellar/glfw/3.2.1/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
 					/usr/local/Cellar/freetype/2.9/lib,
+					"/usr/local/Cellar/glfw/HEAD-bb2ca1d/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
@@ -474,9 +468,9 @@
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
-					/usr/local/Cellar/glfw/3.2.1/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
 					/usr/local/Cellar/freetype/2.9/lib,
+					"/usr/local/Cellar/glfw/HEAD-bb2ca1d/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
