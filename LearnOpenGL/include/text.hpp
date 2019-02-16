@@ -15,6 +15,8 @@
 
 #include "shader.hpp"
 
+using namespace GL; // TODO: remove
+
 class Text {
     GLuint VAO, VBO;
 public:
