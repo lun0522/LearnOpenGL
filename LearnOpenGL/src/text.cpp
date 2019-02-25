@@ -31,10 +31,10 @@ void Text::renderText(const Shader& shader,
                       float y,
                       const float scale,
                       glm::vec3& color) {
-    shader.use();
+    shader.Use();
     glActiveTexture(GL_TEXTURE0);
-    shader.setInt("text", 0);
-    shader.setVec3("color", color);
+    shader.set_int("text", 0);
+    shader.set_vec3("color", color);
     glBindVertexArray(VAO);
 
     for (auto c = text.begin(); c != text.end(); ++c) {

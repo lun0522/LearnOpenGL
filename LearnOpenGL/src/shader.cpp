@@ -9,138 +9,135 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader.hpp"
 
-namespace GL {
-    static unordered_map<string, string> loadedCode{};
-    const string &readCode(const string &path) {
-        auto loaded = loadedCode.find(path);
-        if (loaded == loadedCode.end()) {
-            ifstream file(path);
-            file.exceptions(ifstream::failbit | ifstream::badbit);
-            if (!file.is_open())
-                throw runtime_error{"Failed to open file: " + path};
-            
-            try {
-                ostringstream stream;
-                stream << file.rdbuf();
-                string code = stream.str();
-                loaded = loadedCode.insert({ path, code }).first;
-            } catch (ifstream::failure e) {
-                throw runtime_error{"Failed to read file: " + e.code().message()};
-            }
-        }
-        return loaded->second;
-    }
-    
-    GLuint createShader(GLenum type, const char *code) {
-        // .c_str() returns a r-value, should make it l-value and let it persist
-        GLuint shader = glCreateShader(type);
-        glShaderSource(shader, 1, &code, nullptr); // can pass an array of strings
-        glCompileShader(shader);
-        return shader;
-    }
-    
-    void validateShader(GLuint shader) {
-        int success;
-        char infoLog[512];
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            throw runtime_error{infoLog};
-        }
-    }
-    
-    GLuint createProgram(GLuint vertexShader, GLuint fragmentShader, GLint geometryShader) {
-        GLuint shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        if (geometryShader != GL_INVALID_INDEX)
-            glAttachShader(shaderProgram, geometryShader);
-        glLinkProgram(shaderProgram);
-        return shaderProgram;
-    }
-    
-    void validateLink(GLuint program) {
-        int success;
-        char infoLog[512];
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(program, 512, NULL, infoLog);
-            throw runtime_error{infoLog};
-        }
-    }
-    
-    Shader::Shader(const string &vertPath,
-                   const string &fragPath,
-                   const string &geomPath) {
-        GLuint vertShader = createShader(GL_VERTEX_SHADER, readCode(vertPath).c_str());
-        GLuint fragShader = createShader(GL_FRAGMENT_SHADER, readCode(fragPath).c_str());
-        GLint geomShader = geomPath.empty() ? GL_INVALID_INDEX : createShader(GL_GEOMETRY_SHADER, readCode(geomPath).c_str());
-        try {
-            validateShader(vertShader);
-            validateShader(fragShader);
-            if (geomShader != GL_INVALID_INDEX)
-                validateShader(geomShader);
-        } catch (const string &e) {
-            throw runtime_error{"Failed to create shader: " + e};
-        }
+#define GL_NO_SHADER 0
+
+namespace opengl {
+
+using namespace glm;
+using namespace std;
+
+namespace {
+
+const string& ReadCode(const string& path) {
+    static unordered_map<string, string> kLoadedCode{};
+    auto loaded = kLoadedCode.find(path);
+    if (loaded == kLoadedCode.end()) {
+        ifstream file{path};
+        file.exceptions(ifstream::failbit | ifstream::badbit);
+        if (!file.is_open())
+            throw runtime_error{"Failed to open file: " + path};
         
-        programId = createProgram(vertShader, fragShader, geomShader);
         try {
-            validateLink(programId);
-        } catch (const string &e) {
-            throw runtime_error{"Failed to link: " + e};
+            ostringstream stream;
+            stream << file.rdbuf();
+            string code = stream.str();
+            loaded = kLoadedCode.insert({path, code}).first;
+        } catch (const ifstream::failure& e) {
+            throw runtime_error{"Failed to read file: " + e.code().message()};
         }
-        glDeleteShader(vertShader);
-        glDeleteShader(fragShader);
-        if (!geomPath.empty())
-            glDeleteShader(geomShader);
     }
-    
-    void Shader::use() const {
-        glUseProgram(programId);
-    }
-    
-    GLuint Shader::getUniform(const string &name) const {
-        GLint location = glGetUniformLocation(programId, name.c_str());
-        if (location == GL_INVALID_INDEX)
-            throw runtime_error{"Cannot find uniform: " + name};
-        return location;
-    }
-    
-    void Shader::setInt(const string &name, int value) const {
-        glUniform1i(getUniform(name), value);
-    }
-    
-    void Shader::setFloat(const string &name, float value) const {
-        glUniform1f(getUniform(name), value);
-    }
-    
-    void Shader::setVec3(const string &name, GLfloat v0,
-                         GLfloat v1, GLfloat v2) const {
-        glUniform3f(getUniform(name), v0, v1, v2);
-    }
-    
-    void Shader::setVec3(const string &name, const vec3 &value) const {
-        glUniform3fv(getUniform(name), 1, value_ptr(value));
-    }
-    
-    void Shader::setMat3(const string &name, const mat3 &value) const {
-        // how many matrices to send, transpose or not (GLM is already in coloumn order, so no)
-        glUniformMatrix3fv(getUniform(name), 1, GL_FALSE, value_ptr(value));
-    }
-    
-    void Shader::setMat4(const string &name, const mat4 &value) const {
-        glUniformMatrix4fv(getUniform(name), 1, GL_FALSE, value_ptr(value));
-    }
-    
-    void Shader::setBlock(const string &name, GLuint bindingPoint) const {
-        GLint blockIndex = glGetUniformBlockIndex(programId, name.c_str());
-        if (blockIndex == GL_INVALID_INDEX)
-            throw runtime_error{"Cannot find block: " + name};
-        glUniformBlockBinding(programId, blockIndex, bindingPoint);
-    }
+    return loaded->second;
 }
+
+GLuint CreateShader(GLenum type, const char* code) {
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &code, nullptr); // can pass an array of strings
+    glCompileShader(shader);
+    
+    int success;
+    char info_log[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shader, 512, nullptr, info_log);
+        throw runtime_error{string{"Failed to create shader: "} + info_log};
+    }
+    
+    return shader;
+}
+
+GLuint CreateProgram(GLuint vert_shader,
+                     GLuint frag_shader,
+                     GLuint geom_shader) {
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vert_shader);
+    glAttachShader(program, frag_shader);
+    if (geom_shader != GL_NO_SHADER)
+        glAttachShader(program, geom_shader);
+    glLinkProgram(program);
+    
+    int success;
+    char info_log[512];
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(program, 512, nullptr, info_log);
+        throw runtime_error{string{"Failed to link program: "} + info_log};
+    }
+    
+    return program;
+}
+
+} /* namespace */
+
+Shader::Shader(const string& vert_path,
+               const string& frag_path,
+               const string& geom_path) {
+    GLuint vert_shader = CreateShader(
+        GL_VERTEX_SHADER, ReadCode(vert_path).c_str());
+    GLuint frag_shader = CreateShader(
+        GL_FRAGMENT_SHADER, ReadCode(frag_path).c_str());
+    GLuint geom_shader = geom_path.empty() ? GL_NO_SHADER : CreateShader(
+        GL_GEOMETRY_SHADER, ReadCode(geom_path).c_str());
+    program_id_ = CreateProgram(vert_shader, frag_shader, geom_shader);
+    
+    glDeleteShader(vert_shader);
+    glDeleteShader(frag_shader);
+    if (geom_shader != GL_NO_SHADER)
+        glDeleteShader(geom_shader);
+}
+
+void Shader::Use() const {
+    glUseProgram(program_id_);
+}
+
+GLuint Shader::get_uniform(const string& name) const {
+    GLint location = glGetUniformLocation(program_id_, name.c_str());
+    if (location == GL_INVALID_INDEX)
+        throw runtime_error{"Cannot find uniform: " + name};
+    return location;
+}
+
+void Shader::set_int(const string& name, int value) const {
+    glUniform1i(get_uniform(name), value);
+}
+
+void Shader::set_float(const string& name, float value) const {
+    glUniform1f(get_uniform(name), value);
+}
+
+void Shader::set_vec3(const string& name, const vec3& value) const {
+    glUniform3fv(get_uniform(name), 1, value_ptr(value));
+}
+
+void Shader::set_mat3(const string& name, const mat3& value) const {
+    // how many matrices to send, transpose or not
+    // (GLM is already in coloumn order, so no)
+    glUniformMatrix3fv(get_uniform(name), 1, GL_FALSE, value_ptr(value));
+}
+
+void Shader::set_mat4(const string& name, const mat4& value) const {
+    glUniformMatrix4fv(get_uniform(name), 1, GL_FALSE, value_ptr(value));
+}
+
+void Shader::set_block(const string& name, GLuint binding_point) const {
+    GLint block_index = glGetUniformBlockIndex(program_id_, name.c_str());
+    if (block_index == GL_INVALID_INDEX)
+        throw runtime_error{"Cannot find block: " + name};
+    glUniformBlockBinding(program_id_, block_index, binding_point);
+}
+
+} /* namespace opengl */

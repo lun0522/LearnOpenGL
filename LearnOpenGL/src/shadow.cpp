@@ -35,8 +35,8 @@ Shader(vertPath, fragPath, geomPath)), frustumHeight(frustumHeight) {
     createDepthMap();
     for (int i = 0; i < 6; ++i)
         uniformNames.push_back("lightSpace[" + std::to_string(i) + "]");
-    shader.use();
-    shader.setFloat("frustumHeight", frustumHeight);
+    shader.Use();
+    shader.set_float("frustumHeight", frustumHeight);
 }
 
 OmniShadow OmniShadow::PointLightShadow(const string& vertPath,
@@ -125,8 +125,8 @@ void UniShadow::createDepthMap() {
 }
 
 void OmniShadow::moveLight(const vec3 &position) {
-    shader.use();
-    shader.setVec3("lightPos", position);
+    shader.Use();
+    shader.set_vec3("lightPos", position);
     vector<mat4> lightSpace = {
         projection * lookAt(position, position + vec3( 1.0,  0.0,  0.0), vec3( 0.0, -1.0,  0.0)),
         projection * lookAt(position, position + vec3(-1.0,  0.0,  0.0), vec3( 0.0, -1.0,  0.0)),
@@ -136,15 +136,15 @@ void OmniShadow::moveLight(const vec3 &position) {
         projection * lookAt(position, position + vec3( 0.0,  0.0, -1.0), vec3( 0.0, -1.0,  0.0)),
     };
     for (int i = 0; i < 6; ++i)
-        shader.setMat4(uniformNames[i], lightSpace[i]);
+        shader.set_mat4(uniformNames[i], lightSpace[i]);
 }
 
 void UniShadow::moveLight(const vec3& position,
                           const vec3& front,
                           const vec3& up) {
     lightSpace = projection * lookAt(position, position + front, up);
-    shader.use();
-    shader.setMat4("lightSpace", lightSpace);
+    shader.Use();
+    shader.set_mat4("lightSpace", lightSpace);
 }
 
 void Shadow::calcShadow(const int prevWidth,
@@ -162,9 +162,9 @@ void Shadow::calcShadow(const int prevWidth,
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_DEPTH_BUFFER_BIT);
     
-    shader.use();
+    shader.Use();
     for (int i = 0; i < models.size(); ++i) {
-        shader.setMat4("model", modelMatrices[i]);
+        shader.set_mat4("model", modelMatrices[i]);
         models[i].draw(shader, 0, false); // no need to load texture!
     }
     

@@ -95,7 +95,7 @@ directory(texPath) {
 void Model::draw(const Shader& shader,
                  const GLuint texOffset,
                  const bool loadTexture) const {
-    shader.use();
+    shader.Use();
     std::for_each(meshes.begin(), meshes.end(), [&] (Mesh const& mesh)
                   { mesh.draw(shader, texOffset, loadTexture); });
 }
@@ -104,7 +104,7 @@ void Model::drawInstanced(const Shader& shader,
                           const GLuint amount,
                           const GLuint texOffset,
                           const bool loadTexture) const {
-    shader.use();
+    shader.Use();
     std::for_each(meshes.begin(), meshes.end(), [&] (Mesh const& mesh)
                   { mesh.drawInstanced(shader, amount, texOffset, loadTexture); });
 }

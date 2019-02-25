@@ -70,7 +70,7 @@ void Mesh::bindTexture(const Shader& shader, const GLuint texOffset) const {
         GLuint texIndex = texOffset + i;
         glActiveTexture(GL_TEXTURE0 + texIndex);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
-        shader.setInt(name, texIndex);
+        shader.set_int(name, texIndex);
     }
 }
 

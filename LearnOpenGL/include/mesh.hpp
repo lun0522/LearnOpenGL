@@ -16,7 +16,7 @@
 
 #include "shader.hpp"
 
-using namespace GL; // TODO: remove
+using namespace opengl; // TODO: remove
 
 enum TextureType { DIFFUSE, SPECULAR, REFLECTION };
 

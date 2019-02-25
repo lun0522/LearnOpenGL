@@ -267,8 +267,8 @@ void Render::renderLoop() {
         planetShader,
         asteroidShader,
     }) {
-        shader.use();
-        shader.setBlock("Matrices", 0);
+        shader.Use();
+        shader.set_block("Matrices", 0);
     }
     
     mat4 objectModel = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
@@ -279,8 +279,8 @@ void Render::renderLoop() {
     floorModel = glm::scale(floorModel, vec3(1.0f) * 5.0f);
     
     mat4 glassModel = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 6.0f));
-    glassShader.use();
-    glassShader.setMat4("model", glassModel);
+    glassShader.Use();
+    glassShader.set_mat4("model", glassModel);
     
     vec3 planetCenter(0.0f, 5.5f, 0.0f);
     mat4 planetModel = glm::translate(glm::mat4(1.0f), planetCenter);
@@ -347,45 +347,45 @@ void Render::renderLoop() {
         vec3(0.0f, 0.0f, 1.0f),
     };
     
-    objectShader.use();
-    objectShader.setFloat("material.shininess", 0.2f);
+    objectShader.Use();
+    objectShader.set_float("material.shininess", 0.2f);
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
         string index = std::to_string(i);
-        objectShader.setFloat("frustumHeights[" + index + "]",
+        objectShader.set_float("frustumHeights[" + index + "]",
                               pointLightShadows[i].getFrustumHeight());
-        objectShader.setVec3("pointLightsPos[" + index + "]", lampPos[i]);
+        objectShader.set_vec3("pointLightsPos[" + index + "]", lampPos[i]);
     }
     
     // directional light
-    objectShader.setVec3("dirLight.ambient", 0.0f, 0.0f, 0.0f);
-    objectShader.setVec3("dirLight.diffuse", diffuseColor * 0.5f);
-    objectShader.setVec3("dirLight.specular", ambientColor * 0.5f);
+    objectShader.set_vec3("dirLight.ambient", {0.0f, 0.0f, 0.0f});
+    objectShader.set_vec3("dirLight.diffuse", diffuseColor * 0.5f);
+    objectShader.set_vec3("dirLight.specular", ambientColor * 0.5f);
     
     // point lights
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
         string light = "pointLights[" + std::to_string(i) + "]";
-        objectShader.setFloat(light + ".constant", 1.0f);
-        objectShader.setFloat(light + ".linear", 0.1f);
-        objectShader.setFloat(light + ".quadratic", 0.002f);
+        objectShader.set_float(light + ".constant", 1.0f);
+        objectShader.set_float(light + ".linear", 0.1f);
+        objectShader.set_float(light + ".quadratic", 0.002f);
         vec3 ambient = ambientColor * lampColor[i];
         vec3 diffuse = diffuseColor * lampColor[i];
         vec3 specular = lightColor * lampColor[i];
-        objectShader.setVec3(light + ".ambient", ambient * 0.5f);
-        objectShader.setVec3(light + ".diffuse", diffuse * 0.5f);
-        objectShader.setVec3(light + ".specular", specular * 0.5f);
+        objectShader.set_vec3(light + ".ambient", ambient * 0.5f);
+        objectShader.set_vec3(light + ".diffuse", diffuse * 0.5f);
+        objectShader.set_vec3(light + ".specular", specular * 0.5f);
     }
     
     // spot light
-    objectShader.setVec3("spotLight.position", 0.0f, 0.0f, 0.0f);
-    objectShader.setVec3("spotLight.direction", 0.0f, 0.0f, -1.0f);
-    objectShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(7.5f)));
-    objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(12.5f)));
-    objectShader.setFloat("spotLight.constant", 1.0f);
-    objectShader.setFloat("spotLight.linear", 0.1f);
-    objectShader.setFloat("spotLight.quadratic", 0.002f);
-    objectShader.setVec3("spotLight.ambient", ambientColor * 0.5f);
-    objectShader.setVec3("spotLight.diffuse", diffuseColor * 0.5f);
-    objectShader.setVec3("spotLight.specular", lightColor * 0.5f);
+    objectShader.set_vec3("spotLight.position", {0.0f, 0.0f, 0.0f});
+    objectShader.set_vec3("spotLight.direction", {0.0f, 0.0f, -1.0f});
+    objectShader.set_float("spotLight.innerCutOff", glm::cos(glm::radians(7.5f)));
+    objectShader.set_float("spotLight.outerCutOff", glm::cos(glm::radians(12.5f)));
+    objectShader.set_float("spotLight.constant", 1.0f);
+    objectShader.set_float("spotLight.linear", 0.1f);
+    objectShader.set_float("spotLight.quadratic", 0.002f);
+    objectShader.set_vec3("spotLight.ambient", ambientColor * 0.5f);
+    objectShader.set_vec3("spotLight.diffuse", diffuseColor * 0.5f);
+    objectShader.set_vec3("spotLight.specular", lightColor * 0.5f);
     
     
     // ------------------------------------
@@ -439,12 +439,12 @@ void Render::renderLoop() {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // let stencil test always pass
         glStencilMask(0xFF);
         
-        lampShader.use();
+        lampShader.Use();
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             mat4 lampModel = glm::translate(mat4(1.0f), lampPos[i]);
             lampModel = glm::scale(lampModel, vec3(0.8f));
-            lampShader.setMat4("model", lampModel);
-            lampShader.setVec3("lightColor", lampColor[i]);
+            lampShader.set_mat4("model", lampModel);
+            lampShader.set_vec3("lightColor", lampColor[i]);
             lamp.draw(lampShader);
         }
         
@@ -453,8 +453,8 @@ void Render::renderLoop() {
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             mat4 lampModel = glm::translate(mat4(1.0f), lampPos[i]);
             lampModel = glm::scale(lampModel, vec3(0.85f));
-            lampShader.setMat4("model", lampModel);
-            lampShader.setVec3("lightColor", 5.0f, 5.0f, 0.0f);
+            lampShader.set_mat4("model", lampModel);
+            lampShader.set_vec3("lightColor", {5.0f, 5.0f, 0.0f});
             lamp.draw(lampShader);
         }
         
@@ -485,37 +485,37 @@ void Render::renderLoop() {
         
         glDisable(GL_CULL_FACE); // for explosion effect
         
-        objectShader.use();
+        objectShader.Use();
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             pointLightShadows[i].bindShadowMap(GL_TEXTURE0 + i);
-            objectShader.setInt("pointLightDepthMaps[" + std::to_string(i) + "]", i);
+            objectShader.set_int("pointLightDepthMaps[" + std::to_string(i) + "]", i);
         }
-        objectShader.setMat4("dirLightSpace", dirLightShadow.getLightSpaceMatrix());
+        objectShader.set_mat4("dirLightSpace", dirLightShadow.getLightSpaceMatrix());
         dirLightShadow.bindShadowMap(GL_TEXTURE3);
-        objectShader.setInt("dirLightDepthMap", 3);
-        objectShader.setMat4("spotLightSpace", spotLightShadow.getLightSpaceMatrix());
+        objectShader.set_int("dirLightDepthMap", 3);
+        objectShader.set_mat4("spotLightSpace", spotLightShadow.getLightSpaceMatrix());
         spotLightShadow.bindShadowMap(GL_TEXTURE4);
-        objectShader.setInt("spotLightDepthMap", 4);
+        objectShader.set_int("spotLightDepthMap", 4);
         
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-        objectShader.setInt("material.envMap", 5);
+        objectShader.set_int("material.envMap", 5);
         
-        objectShader.setFloat("explosion", explosion);
+        objectShader.set_float("explosion", explosion);
         mat3 normal = glm::transpose(glm::inverse(mat3(view * objectModel)));
-        objectShader.setMat3("normal", normal);
+        objectShader.set_mat3("normal", normal);
         mat3 invView = glm::inverse(glm::mat3(view));
-        objectShader.setMat3("invView", invView);
+        objectShader.set_mat3("invView", invView);
         
         // lights direction in camera space
         vec3 dirLightDir = vec3(view * vec4(dirLight, 0.0f));
-        objectShader.setVec3("dirLight.direction", dirLightDir);
+        objectShader.set_vec3("dirLight.direction", dirLightDir);
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
             vec3 pointLightDir = vec3(view * vec4(lampPos[i], 1.0f));
-            objectShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightDir);
+            objectShader.set_vec3("pointLights[" + std::to_string(i) + "].position", pointLightDir);
         }
         
-        objectShader.setMat4("model", objectModel);
+        objectShader.set_mat4("model", objectModel);
         object.draw(objectShader, 6);
         
         glEnable(GL_CULL_FACE);
@@ -527,22 +527,22 @@ void Render::renderLoop() {
         glBindTexture(GL_TEXTURE_2D, floorTex);
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, blackTex);
-        objectShader.setInt("material.diffuse0", 6);
-        objectShader.setInt("material.specular0", 7);
-        objectShader.setInt("material.reflection0", 7);
+        objectShader.set_int("material.diffuse0", 6);
+        objectShader.set_int("material.specular0", 7);
+        objectShader.set_int("material.reflection0", 7);
         
         normal = glm::transpose(glm::inverse(mat3(view * floorModel)));
-        objectShader.setMat3("normal", normal);
-        objectShader.setMat4("model", floorModel);
+        objectShader.set_mat3("normal", normal);
+        objectShader.set_mat4("model", floorModel);
         glass.draw(objectShader);
         
         
         // ------------------------------------
         // render planet and asteroids
         
-        planetShader.use();
+        planetShader.Use();
         planetModel = glm::rotate(planetModel, 0.01f, vec3(0.0f, 1.0f, 0.0f));
-        planetShader.setMat4("model", glm::scale(planetModel, vec3(0.5f)));
+        planetShader.set_mat4("model", glm::scale(planetModel, vec3(0.5f)));
         planet.draw(planetShader);
         asteroid.drawInstanced(asteroidShader, NUM_ASTEROID);
         
@@ -559,8 +559,8 @@ void Render::renderLoop() {
         glDepthFunc(GL_LEQUAL);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-        skyboxShader.use();
-        skyboxShader.setInt("skybox", 0);
+        skyboxShader.Use();
+        skyboxShader.set_int("skybox", 0);
         skybox.draw(skyboxShader);
         glDepthFunc(GL_LESS);
         
@@ -571,8 +571,8 @@ void Render::renderLoop() {
         // render this at last because of alpha blending
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, glassTex);
-        glassShader.use();
-        glassShader.setInt("texture1", 0);
+        glassShader.Use();
+        glassShader.set_int("texture1", 0);
         glass.draw(glassShader);
         
         text.renderText(textShader, "FPS: " + std::to_string(FPS),
@@ -592,24 +592,24 @@ void Render::renderLoop() {
         glDrawBuffers(1, &attachments[1]);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-        hdrShader.use();
-        hdrShader.setInt("texture1", 0);
+        hdrShader.Use();
+        hdrShader.set_int("texture1", 0);
         screen.draw(hdrShader);
         
         // blur highlights in colorBuffers[1]
         // ping-pong between colorBuffers[2] and colorBuffers[3]
         // and finally store in colorBuffers[3]
-        gaussianShader.use();
-        gaussianShader.setInt("texture1", 0);
+        gaussianShader.Use();
+        gaussianShader.set_int("texture1", 0);
         glActiveTexture(GL_TEXTURE0);
         for (int i = 0; i < 5; ++i) {
-            gaussianShader.setInt("horizontal", 1);
+            gaussianShader.set_int("horizontal", 1);
             glDrawBuffers(1, &attachments[2]);
             if (i == 0) glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
             else        glBindTexture(GL_TEXTURE_2D, colorBuffers[3]);
             screen.draw(gaussianShader);
 
-            gaussianShader.setInt("horizontal", 0);
+            gaussianShader.set_int("horizontal", 0);
             glDrawBuffers(1, &attachments[3]);
             glBindTexture(GL_TEXTURE_2D, colorBuffers[2]);
             screen.draw(gaussianShader);
@@ -622,10 +622,10 @@ void Render::renderLoop() {
         glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, colorBuffers[3]);
-        blendShader.use();
-        blendShader.setFloat("exposure", 0.8f);
-        blendShader.setInt("scene", 0);
-        blendShader.setInt("bloom", 1);
+        blendShader.Use();
+        blendShader.set_float("exposure", 0.8f);
+        blendShader.set_int("scene", 0);
+        blendShader.set_int("bloom", 1);
         screen.draw(blendShader);
         
         glDrawBuffers(1, &attachments[0]);
@@ -634,8 +634,8 @@ void Render::renderLoop() {
         // render to default framebuffer
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
-        screenShader.use();
-        screenShader.setInt("texture1", 0);
+        screenShader.Use();
+        screenShader.set_int("texture1", 0);
         
         glViewport(0, 0, currentSize.width, currentSize.height);
         screen.draw(screenShader); // draw screen in original size
