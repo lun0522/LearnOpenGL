@@ -51,11 +51,11 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 void mouseMoveCallback(GLFWwindow *window, double xPos, double yPos) {
-    camera.processMouseMove(xPos, yPos);
+    camera.ProcessMouseMove(xPos, yPos);
 }
 
 void mouseScrollCallback(GLFWwindow *window, double xPos, double yPos) {
-    camera.processMouseScroll(yPos, 1.0f, 60.0f);
+    camera.ProcessMouseScroll(yPos, 1.0f, 60.0f);
 }
 
 void Render::processKeyboardInput() {
@@ -70,13 +70,13 @@ void Render::processKeyboardInput() {
     
     float distance = deltaTime * 5.0f;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera.processKeyboardInput(UP, distance);
+        camera.ProcessKeyboardInput(CameraMoveDirection::kUp, distance);
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera.processKeyboardInput(DOWN, distance);
+        camera.ProcessKeyboardInput(CameraMoveDirection::kDown, distance);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.processKeyboardInput(LEFT, distance);
+        camera.ProcessKeyboardInput(CameraMoveDirection::kLeft, distance);
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.processKeyboardInput(RIGHT, distance);
+        camera.ProcessKeyboardInput(CameraMoveDirection::kRight, distance);
     if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
         explosion = std::max(0.0f, explosion - 0.1f);
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
@@ -119,7 +119,7 @@ Render::Render() {
     currentSize = { width, height };
     originalSize = currentSize;
     glViewport(0, 0, currentSize.width, currentSize.height); // specify render area
-    camera.setScreenSize(currentSize.width, currentSize.height);
+    camera.set_screen_size(currentSize.width, currentSize.height);
 }
 
 void Render::renderLoop() {
@@ -423,8 +423,8 @@ void Render::renderLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         // set once, use anywhere
-        mat4 view = camera.getViewMatrix();
-        mat4 projection = camera.getProjectionMatrix();
+        mat4 view = camera.view_matrix();
+        mat4 projection = camera.proj_matrix();
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), glm::value_ptr(view));
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), glm::value_ptr(projection));
@@ -479,7 +479,7 @@ void Render::renderLoop() {
                                             framebuffer, models, modelMatrices);
         dirLightShadow.calcShadow(originalSize.width, originalSize.height,
                                   framebuffer, models, modelMatrices);
-        spotLightShadow.moveLight(camera.getPosition(), camera.getDirection());
+        spotLightShadow.moveLight(camera.position(), camera.direction());
         spotLightShadow.calcShadow(originalSize.width, originalSize.height,
                                    framebuffer, models, modelMatrices);
         

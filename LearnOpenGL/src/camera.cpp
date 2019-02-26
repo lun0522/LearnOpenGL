@@ -6,116 +6,97 @@
 //  Copyright © 2018 Pujun Lun. All rights reserved.
 //
 
+#include <iostream>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
 
-using glm::vec3;
-using glm::mat4;
+namespace opengl {
 
-Camera::Camera(const vec3& position,
-               const vec3& front,
-               const vec3& up,
-               const float fov,
-               const float near,
-               const float far,
-               const float yaw,
-               const float pitch,
-               const float sensitivity):
-position(position), front(front), up(up),
-fov(fov), near(near), far(far), yaw(yaw), pitch(pitch),
-sensitivity(sensitivity), firstFrame(true) {
-    updateRight();
-    updateViewMatrix();
+using namespace glm;
+using std::runtime_error;
+
+Camera::Camera(const vec3& position, const vec3& front, const vec3& up,
+               float fov, float near, float far,
+               float yaw, float pitch, float sensitivity)
+: position_{position}, front_{front}, up_{up},
+  fov_{fov}, near_{near}, far_{far},
+  yaw_{yaw}, pitch_{pitch}, sensitivity_{sensitivity} {
+    UpdateRightVector();
+    UpdateViewMatrix();
 }
 
-void Camera::setScreenSize(const int screenWidth, const int screenHeight) {
-    width = screenWidth;
-    height = screenHeight;
-    lastX = width / 2.0f;
-    lastY = height / 2.0f;
-    updateProjectionMatrix();
+void Camera::UpdateFrontVector() {
+    front_ = vec3(cos(radians(pitch_)) * cos(radians(yaw_)),
+                  sin(radians(pitch_)),
+                  cos(radians(pitch_)) * sin(radians(yaw_)));
 }
 
-void Camera::processMouseMove(const double xPos, const double yPos) {
-    if (firstFrame) {
-        lastX = xPos;
-        lastY = yPos;
-        firstFrame = false;
+void Camera::UpdateRightVector() {
+    right_ = normalize(cross(front_, up_));
+}
+
+void Camera::UpdateViewMatrix() {
+    view_ = lookAt(position_, position_ + front_, up_);
+}
+
+void Camera::UpdateProjMatrix() {
+    if (width_ == 0.0f || height_ == 0.0f)
+        throw runtime_error{"Screen size has not been set"};
+    proj_ = perspective(radians(fov_), width_ / height_, near_, far_);
+}
+
+void Camera::ProcessMouseMove(double x, double y) {
+    if (is_first_frame_) {
+        last_x_ = x;
+        last_y_ = y;
+        is_first_frame_ = false;
     }
+    float x_offset = (x - last_x_) * sensitivity_;
+    float y_offset = (last_y_ - y) * sensitivity_;
+    last_x_ = x;
+    last_y_ = y;
+    yaw_ = mod(yaw_ + x_offset, 360.0f);
+    pitch_ = clamp(pitch_ + y_offset, -89.0f, 89.0f);
     
-    float xOffset = (xPos - lastX) * sensitivity;
-    float yOffset = (lastY - yPos) * sensitivity;
-    lastX = xPos;
-    lastY = yPos;
-    
-    yaw += xOffset;
-    yaw = glm::mod(yaw, 360.0f);
-    
-    pitch += yOffset;
-    if (pitch > 89.0f) pitch = 89.0f;
-    else if (pitch < -89.0f) pitch = -89.0f;
-    
-    front = vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
-                 sin(glm::radians(pitch)),
-                 cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
-    updateRight();
-    updateViewMatrix();
+    UpdateFrontVector();
+    UpdateRightVector();
+    UpdateViewMatrix();
 }
 
-void Camera::processMouseScroll(const double yOffset, const double minVal, const double maxVal) {
-    fov += yOffset;
-    if (fov < minVal) fov = minVal;
-    else if (fov > maxVal) fov = maxVal;
-    updateProjectionMatrix();
+void Camera::ProcessMouseScroll(double y, double min_val, double max_val) {
+    fov_ = clamp(fov_ + y, min_val, max_val);
+    UpdateProjMatrix();
 }
 
-void Camera::processKeyboardInput(const CameraMoveDirection direction, const float distance) {
+void Camera::set_screen_size(int width, int height) {
+    width_ = width;
+    height_ = height;
+    last_x_ = width / 2.0f;
+    last_y_ = height / 2.0f;
+    UpdateProjMatrix();
+}
+
+void Camera::ProcessKeyboardInput(CameraMoveDirection direction,
+                                  float distance) {
     switch (direction) {
-        case UP:
-            position += front * distance;
+        case CameraMoveDirection::kUp:
+            position_ += front_ * distance;
             break;
-        case DOWN:
-            position -= front * distance;
+        case CameraMoveDirection::kDown:
+            position_ -= front_ * distance;
             break;
-        case LEFT:
-            position += right * distance;
+        case CameraMoveDirection::kLeft:
+            position_ += right_ * distance;
             break;
-        case RIGHT:
-            position -= right * distance;
+        case CameraMoveDirection::kRight:
+            position_ -= right_ * distance;
             break;
         default:
-            throw "Invalid direction";
+            throw runtime_error{"Invalid direction"};
     }
-    updateViewMatrix();
+    UpdateViewMatrix();
 }
 
-const glm::vec3& Camera::getPosition() const {
-    return position;
-}
-
-const glm::vec3& Camera::getDirection() const {
-    return front;
-}
-
-const mat4& Camera::getViewMatrix() const {
-    return view;
-}
-
-const mat4& Camera::getProjectionMatrix() const {
-    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
-    return projection;
-}
-
-void Camera::updateRight() {
-    right = glm::normalize(glm::cross(front, up));
-}
-
-void Camera::updateProjectionMatrix() {
-    if (width == 0.0f || height == 0.0f) throw "Screen size has not been set";
-    projection = glm::perspective(glm::radians(fov), width / height, near, far);
-}
-
-void Camera::updateViewMatrix() {
-    view = glm::lookAt(position, position + front, up);
-}
+} /* opengl */
