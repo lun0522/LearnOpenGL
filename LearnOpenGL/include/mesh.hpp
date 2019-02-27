@@ -9,6 +9,7 @@
 #ifndef mesh_hpp
 #define mesh_hpp
 
+#include <functional>
 #include <string>
 #include <vector>
 #include <glad/glad.h>
@@ -16,9 +17,17 @@
 
 #include "shader.hpp"
 
-using namespace opengl; // TODO: remove
+namespace opengl {
 
-enum TextureType { DIFFUSE, SPECULAR, REFLECTION };
+using glm::vec2;
+using glm::vec3;
+using std::function;
+using std::string;
+using std::vector;
+
+enum class TextureType {
+    kDiffuse, kSpecular, kReflection,
+};
 
 struct Texture {
     GLuint id;
@@ -26,34 +35,31 @@ struct Texture {
 };
 
 struct Vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texCoord;
+    vec3 position;
+    vec3 normal;
+    vec2 tex_coord;
 };
 
 class Mesh {
-    GLuint VAO, VBO, EBO;
-    const std::vector<Vertex> vertices;
-    const std::vector<GLuint> indices;
-    const std::vector<Texture> textures;
-    void bindTexture(const Shader& shader, const GLuint texOffset) const;
+    GLuint vao_, vbo_, ebo_;
+    const vector<Vertex> vertices_;
+    const vector<GLuint> indices_;
+    const vector<Texture> textures_;
+    
 public:
-    Mesh(const std::vector<Vertex>& vertices,
-         const std::vector<GLuint>& indices,
-         const std::vector<Texture>& textures);
-    void draw(const Shader& shader,
-              const GLuint texOffset,
-              const bool loadTexture) const;
-    void drawInstanced(const Shader& shader,
-                       const GLuint amount,
-                       const GLuint texOffset,
-                       const bool loadTexture) const;
-    template<typename Func>
-    void appendData(const Func& func) const {
-        glBindVertexArray(VAO);
-        func();
-        glBindVertexArray(0);
-    }
+    Mesh(const vector<Vertex>& vertices,
+         const vector<GLuint>& indices,
+         const vector<Texture>& textures);
+    void Draw(const Shader& shader,
+              GLuint tex_offset,
+              bool load_texture) const;
+    void DrawInstanced(const Shader& shader,
+                       GLuint amount,
+                       GLuint tex_offset,
+                       bool load_texture) const;
+    void AppendData(const function<void ()>& func) const;
 };
+
+} /* opengl */
 
 #endif /* mesh_hpp */

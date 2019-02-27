@@ -165,7 +165,7 @@ void Shadow::calcShadow(const int prevWidth,
     shader.Use();
     for (int i = 0; i < models.size(); ++i) {
         shader.set_mat4("model", modelMatrices[i]);
-        models[i].draw(shader, 0, false); // no need to load texture!
+        models[i].Draw(shader, 0, false); // no need to load texture!
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, prevFrameBuffer);

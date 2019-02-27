@@ -17,6 +17,8 @@
 #include "shader.hpp"
 #include "model.hpp"
 
+using namespace opengl; // TODO: remove
+
 class Shadow {
     Shadow();
 protected:

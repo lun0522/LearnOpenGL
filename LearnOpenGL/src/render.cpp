@@ -327,7 +327,7 @@ void Render::renderLoop() {
             glVertexAttribDivisor(attrib, 1);
         }
     };
-    asteroid.appendData(func);
+    asteroid.AppendData(func);
     
     vec3 lightColor(0.4f);
     vec3 ambientColor = lightColor * 0.1f;
@@ -445,7 +445,7 @@ void Render::renderLoop() {
             lampModel = glm::scale(lampModel, vec3(0.8f));
             lampShader.set_mat4("model", lampModel);
             lampShader.set_vec3("lightColor", lampColor[i]);
-            lamp.draw(lampShader);
+            lamp.Draw(lampShader);
         }
         
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -455,7 +455,7 @@ void Render::renderLoop() {
             lampModel = glm::scale(lampModel, vec3(0.85f));
             lampShader.set_mat4("model", lampModel);
             lampShader.set_vec3("lightColor", {5.0f, 5.0f, 0.0f});
-            lamp.draw(lampShader);
+            lamp.Draw(lampShader);
         }
         
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -516,7 +516,7 @@ void Render::renderLoop() {
         }
         
         objectShader.set_mat4("model", objectModel);
-        object.draw(objectShader, 6);
+        object.Draw(objectShader, 6);
         
         glEnable(GL_CULL_FACE);
         
@@ -534,7 +534,7 @@ void Render::renderLoop() {
         normal = glm::transpose(glm::inverse(mat3(view * floorModel)));
         objectShader.set_mat3("normal", normal);
         objectShader.set_mat4("model", floorModel);
-        glass.draw(objectShader);
+        glass.Draw(objectShader);
         
         
         // ------------------------------------
@@ -543,8 +543,8 @@ void Render::renderLoop() {
         planetShader.Use();
         planetModel = glm::rotate(planetModel, 0.01f, vec3(0.0f, 1.0f, 0.0f));
         planetShader.set_mat4("model", glm::scale(planetModel, vec3(0.5f)));
-        planet.draw(planetShader);
-        asteroid.drawInstanced(asteroidShader, NUM_ASTEROID);
+        planet.Draw(planetShader);
+        asteroid.DrawInstanced(asteroidShader, NUM_ASTEROID);
         
         
         // ------------------------------------
@@ -561,7 +561,7 @@ void Render::renderLoop() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
         skyboxShader.Use();
         skyboxShader.set_int("skybox", 0);
-        skybox.draw(skyboxShader);
+        skybox.Draw(skyboxShader);
         glDepthFunc(GL_LESS);
         
         
@@ -573,7 +573,7 @@ void Render::renderLoop() {
         glBindTexture(GL_TEXTURE_2D, glassTex);
         glassShader.Use();
         glassShader.set_int("texture1", 0);
-        glass.draw(glassShader);
+        glass.Draw(glassShader);
         
         text.renderText(textShader, "FPS: " + std::to_string(FPS),
                         -0.95f, 0.9f, 1.0f / 1000.0f, textColor);
@@ -594,7 +594,7 @@ void Render::renderLoop() {
         glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
         hdrShader.Use();
         hdrShader.set_int("texture1", 0);
-        screen.draw(hdrShader);
+        screen.Draw(hdrShader);
         
         // blur highlights in colorBuffers[1]
         // ping-pong between colorBuffers[2] and colorBuffers[3]
@@ -607,12 +607,12 @@ void Render::renderLoop() {
             glDrawBuffers(1, &attachments[2]);
             if (i == 0) glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
             else        glBindTexture(GL_TEXTURE_2D, colorBuffers[3]);
-            screen.draw(gaussianShader);
+            screen.Draw(gaussianShader);
 
             gaussianShader.set_int("horizontal", 0);
             glDrawBuffers(1, &attachments[3]);
             glBindTexture(GL_TEXTURE_2D, colorBuffers[2]);
-            screen.draw(gaussianShader);
+            screen.Draw(gaussianShader);
         }
         
         // blend original scene (0) with blurred highlights (3)
@@ -626,7 +626,7 @@ void Render::renderLoop() {
         blendShader.set_float("exposure", 0.8f);
         blendShader.set_int("scene", 0);
         blendShader.set_int("bloom", 1);
-        screen.draw(blendShader);
+        screen.Draw(blendShader);
         
         glDrawBuffers(1, &attachments[0]);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -638,10 +638,10 @@ void Render::renderLoop() {
         screenShader.set_int("texture1", 0);
         
         glViewport(0, 0, currentSize.width, currentSize.height);
-        screen.draw(screenShader); // draw screen in original size
+        screen.Draw(screenShader); // draw screen in original size
         
         glViewport(0, 0, currentSize.width / 4, currentSize.height / 4);
-        screen.draw(screenShader); // draw screen in small size
+        screen.Draw(screenShader); // draw screen in small size
         
         glfwSwapBuffers(window); // use color buffer to draw
         glfwPollEvents(); // check events (keyboard, mouse, ...)

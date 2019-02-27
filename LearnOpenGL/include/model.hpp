@@ -9,34 +9,47 @@
 #ifndef model_hpp
 #define model_hpp
 
+#include <functional>
 #include <vector>
 #include <string>
 #include <assimp/scene.h>
 
 #include "mesh.hpp"
 
+namespace opengl {
+
+using std::string;
+using std::vector;
+
 class Model {
-    std::string directory;
-    std::vector<Mesh> meshes;
-    void processNode(const aiNode *node, const aiScene *scene);
-    Mesh processMesh(const aiMesh *mesh, const aiScene *scene);
-    std::vector<Texture> loadMaterialTextures(const aiMaterial *material,
-                                              const aiTextureType aiType,
-                                              const TextureType type);
+    vector<Mesh> meshes_;
+    
 public:
-    Model(const std::string& objPath, const std::string& texPath = "");
-    void draw(const Shader& shader,
-              const GLuint texOffset = 0,
-              const bool loadTexture = true) const;
-    void drawInstanced(const Shader& shader,
-                       const GLuint amount,
-                       const GLuint texOffset = 0,
-                       const bool loadTexture = true) const;
-    template<typename Func>
-    void appendData(const Func& func) const {
-        std::for_each(meshes.begin(), meshes.end(),
-                      [&] (Mesh const& mesh) { mesh.appendData(func); });
+    Model(const string& obj_path, const string& tex_path = "");
+    
+    void Draw(const Shader& shader,
+              GLuint tex_offset = 0,
+              bool load_texture = true) const {
+        shader.Use();
+        for (const auto& mesh : meshes_)
+            mesh.Draw(shader, tex_offset, load_texture);
+    }
+    
+    void DrawInstanced(const Shader& shader,
+                       GLuint amount,
+                       GLuint tex_offset = 0,
+                       bool load_texture = true) const {
+        shader.Use();
+        for (const auto& mesh : meshes_)
+            mesh.DrawInstanced(shader, amount, tex_offset, load_texture);
+    }
+        
+    void AppendData(const function<void ()>& func) const {
+        for (const auto& mesh : meshes_)
+            mesh.AppendData(func);
     }
 };
+
+} /* namespace opengl */
 
 #endif /* model_hpp */
