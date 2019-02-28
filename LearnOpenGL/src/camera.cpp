@@ -12,10 +12,10 @@
 
 #include "camera.hpp"
 
-namespace opengl {
-
 using namespace glm;
-using std::runtime_error;
+using namespace std;
+
+namespace opengl {
 
 Camera::Camera(const vec3& position, const vec3& front, const vec3& up,
                float fov, float near, float far,

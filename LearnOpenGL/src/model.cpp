@@ -13,11 +13,10 @@
 #include "loader.hpp"
 #include "model.hpp"
 
-namespace opengl {
+using namespace glm;
+using namespace std;
 
-using glm::vec2;
-using glm::vec3;
-using std::runtime_error;
+namespace opengl {
 
 namespace {
 

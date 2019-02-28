@@ -15,11 +15,10 @@
 #include "shader.hpp"
 
 #define GL_NO_SHADER 0
-
-namespace opengl {
-
 using namespace glm;
 using namespace std;
+
+namespace opengl {
 
 namespace {
 

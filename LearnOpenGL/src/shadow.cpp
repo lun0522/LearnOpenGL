@@ -11,84 +11,97 @@
 #include "loader.hpp"
 #include "shadow.hpp"
 
-using std::vector;
-using std::string;
-using glm::vec3;
-using glm::mat4;
-using glm::lookAt;
+using namespace glm;
+using namespace std;
 
-const int CUBE_MAP_SIDE_LENGTH = 1024;
+namespace opengl {
 
-Shadow::Shadow(const int width,
-               const int height,
+namespace {
+const int kCubeMapSideLength{1024};
+const string kOmniShadowVertShader{"shader_omnishadow.vs"};
+const string kOmniShadowGeomShader{"shader_omnishadow.gs"};
+const string kOmniShadowFragShader{"shader_omnishadow.fs"};
+const string kUniShadowVertShader{"shader_unishadow.vs"};
+const string kUniShadowFragShader{"shader_unishadow.fs"};
+} /* namespace */
+
+Shadow::Shadow(int width,
+               int height,
                const mat4& projection,
-               const Shader& shader):
-width(width), height(height), projection(projection), shader(shader) {}
+               const Shader& shader)
+: width_{width}, height_{height}, proj_{projection}, shader_{shader} {}
 
-OmniShadow::OmniShadow(const float frustumHeight,
-                       const mat4& projection,
-                       const string& vertPath,
-                       const string& geomPath,
-                       const string& fragPath):
-Shadow(CUBE_MAP_SIDE_LENGTH, CUBE_MAP_SIDE_LENGTH, projection,
-Shader(vertPath, fragPath, geomPath)), frustumHeight(frustumHeight) {
-    createDepthMap();
+void Shadow::CalculateShadow(int prev_width,
+                             int prev_height,
+                             GLuint prev_frameBuffer,
+                             const vector<Model>& models,
+                             const vector<mat4>& model_matrices) const {
+    if (models.size() != model_matrices.size())
+        throw runtime_error{"Vector size incompatible"};
+    
+    // to avoid peter panning (side effect of setting bias in fragment shader)
+    // (sometimes culling front face instead of back face also works)
+    glEnable(GL_CULL_FACE);
+    glViewport(0, 0, width_, height_);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    shader_.Use();
+    for (int i = 0; i < models.size(); ++i) {
+        shader_.set_mat4("model", model_matrices[i]);
+        models[i].Draw(shader_, 0, false); // no need to load texture!
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, prev_frameBuffer);
+    glViewport(0, 0, prev_width, prev_height);
+    glDisable(GL_CULL_FACE);
+}
+
+OmniShadow::OmniShadow(float frustum_height, const mat4& projection)
+: Shadow{kCubeMapSideLength, kCubeMapSideLength, projection,
+         {kOmniShadowVertShader, kOmniShadowFragShader, kOmniShadowGeomShader}},
+  frustum_height_{frustum_height} {
+    CreateDepthMap();
     for (int i = 0; i < 6; ++i)
-        uniformNames.push_back("lightSpace[" + std::to_string(i) + "]");
-    shader.Use();
-    shader.set_float("frustumHeight", frustumHeight);
+        uniform_names_.emplace_back("lightSpace[" + to_string(i) + "]");
+    shader_.Use();
+    shader_.set_float("frustumHeight", frustum_height_);
 }
 
-OmniShadow OmniShadow::PointLightShadow(const string& vertPath,
-                                        const string& geomPath,
-                                        const string& fragPath,
-                                        const float near,
-                                        const float far) {
-    mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, near, far);
-    return OmniShadow(far - near, projection, vertPath, geomPath, fragPath);
+OmniShadow OmniShadow::PointLightShadow(float near, float far) {
+    mat4 projection = perspective(radians(90.0f), 1.0f, near, far);
+    return OmniShadow{far - near, projection};
 }
 
-UniShadow::UniShadow(const int width,
-                     const int height,
-                     const mat4& projection,
-                     const string& vertPath,
-                     const string& fragPath):
-Shadow(width, height, projection, Shader(vertPath, fragPath)) {
-    createDepthMap();
+UniShadow::UniShadow(int width, int height, const mat4& projection)
+: Shadow{width, height, projection,
+         {kUniShadowVertShader, kUniShadowFragShader}} {
+    CreateDepthMap();
 }
 
-UniShadow UniShadow::DirLightShadow(const string& vertPath,
-                                    const string& fragPath,
-                                    const int width,
-                                    const int height,
-                                    const float left,
-                                    const float right,
-                                    const float bottom,
-                                    const float top,
-                                    const float near,
-                                    const float far) {
-    mat4 projection = glm::ortho(left, right, bottom, top, near, far);
-    return UniShadow(width, height, projection, vertPath, fragPath);
+UniShadow UniShadow::DirLightShadow(int width, int height,
+                                    float left, float right,
+                                    float bottom, float top,
+                                    float near, float far) {
+    mat4 projection = ortho(left, right, bottom, top, near, far);
+    return UniShadow{width, height, projection};
 }
 
-UniShadow UniShadow::SpotLightShadow(const string& vertPath,
-                                     const string& fragPath,
-                                     const int width,
-                                     const int height,
-                                     const float fov,
-                                     const float near,
-                                     const float far) {
-    mat4 projection = glm::perspective(glm::radians(fov), (float) width / height, near, far);
-    return UniShadow(width, height, projection, vertPath, fragPath);
+UniShadow UniShadow::SpotLightShadow(int width, int height,
+                                     float fov, float near, float far) {
+    mat4 projection = perspective(
+        radians(fov), (float) width / height, near, far);
+    return UniShadow{width, height, projection};
 }
 
-void OmniShadow::createDepthMap() {
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
+void OmniShadow::CreateDepthMap() {
+    glGenTextures(1, &depth_map_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depth_map_);
     for (int i = 0; i < 6; ++i)
         // width and height of cubemap must be equal!
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, CUBE_MAP_SIDE_LENGTH,
-                     CUBE_MAP_SIDE_LENGTH, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+                     kCubeMapSideLength, kCubeMapSideLength, 0,
+                     GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -96,97 +109,73 @@ void OmniShadow::createDepthMap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0);
+    glGenFramebuffers(1, &fbo_);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_map_, 0);
     // by following two lines, we tell OpenGL there will be no color component
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void UniShadow::createDepthMap() {
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+void UniShadow::CreateDepthMap() {
+    glGenTextures(1, &depth_map_);
+    glBindTexture(GL_TEXTURE_2D, depth_map_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width_, height_, 0,
+                 GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     Loader::set2DTexParameter(GL_NEAREST, GL_CLAMP_TO_BORDER);
-    // set border "color" to 1.0, so that if object is outside of cross section of
-    // camera view frustum, it will not be shadowed
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    // set border "color" to 1.0, so that if object is outside of cross section
+    // of camera view frustum, it will not be shadowed
+    float border_color[]{ 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
     
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glGenFramebuffers(1, &fbo_);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_map_, 0);
     // by following two lines, we tell OpenGL there will be no color component
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OmniShadow::moveLight(const vec3 &position) {
-    shader.Use();
-    shader.set_vec3("lightPos", position);
-    vector<mat4> lightSpace = {
-        projection * lookAt(position, position + vec3( 1.0,  0.0,  0.0), vec3( 0.0, -1.0,  0.0)),
-        projection * lookAt(position, position + vec3(-1.0,  0.0,  0.0), vec3( 0.0, -1.0,  0.0)),
-        projection * lookAt(position, position + vec3( 0.0,  1.0,  0.0), vec3( 0.0,  0.0,  1.0)),
-        projection * lookAt(position, position + vec3( 0.0, -1.0,  0.0), vec3( 0.0,  0.0, -1.0)),
-        projection * lookAt(position, position + vec3( 0.0,  0.0,  1.0), vec3( 0.0, -1.0,  0.0)),
-        projection * lookAt(position, position + vec3( 0.0,  0.0, -1.0), vec3( 0.0, -1.0,  0.0)),
+void OmniShadow::MoveLight(const vec3& position) {
+    shader_.Use();
+    shader_.set_vec3("lightPos", position);
+    vector<mat4> light_spaces = {
+        proj_ * lookAt(position, position + vec3{ 1.0,  0.0,  0.0},
+                       vec3{ 0.0, -1.0,  0.0}),
+        proj_ * lookAt(position, position + vec3{-1.0,  0.0,  0.0},
+                       vec3{ 0.0, -1.0,  0.0}),
+        proj_ * lookAt(position, position + vec3{ 0.0,  1.0,  0.0},
+                       vec3{ 0.0,  0.0,  1.0}),
+        proj_ * lookAt(position, position + vec3{ 0.0, -1.0,  0.0},
+                       vec3{ 0.0,  0.0, -1.0}),
+        proj_ * lookAt(position, position + vec3{ 0.0,  0.0,  1.0},
+                       vec3{ 0.0, -1.0,  0.0}),
+        proj_ * lookAt(position, position + vec3{ 0.0,  0.0, -1.0},
+                       vec3{ 0.0, -1.0,  0.0}),
     };
     for (int i = 0; i < 6; ++i)
-        shader.set_mat4(uniformNames[i], lightSpace[i]);
+        shader_.set_mat4(uniform_names_[i], light_spaces[i]);
 }
 
-void UniShadow::moveLight(const vec3& position,
+void UniShadow::MoveLight(const vec3& position,
                           const vec3& front,
                           const vec3& up) {
-    lightSpace = projection * lookAt(position, position + front, up);
-    shader.Use();
-    shader.set_mat4("lightSpace", lightSpace);
+    light_space_ = proj_ * lookAt(position, position + front, up);
+    shader_.Use();
+    shader_.set_mat4("lightSpace", light_space_);
 }
 
-void Shadow::calcShadow(const int prevWidth,
-                        const int prevHeight,
-                        const GLuint prevFrameBuffer,
-                        const vector<Model>& models,
-                        const vector<mat4>& modelMatrices) const {
-    if (models.size() != modelMatrices.size())
-        throw "Vector size incompatible";
-    
-    // to avoid peter panning (side effect of setting bias in fragment shader)
-    // (sometimes culling front face instead of back face also works)
-    glEnable(GL_CULL_FACE);
-    glViewport(0, 0, width, height);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    
-    shader.Use();
-    for (int i = 0; i < models.size(); ++i) {
-        shader.set_mat4("model", modelMatrices[i]);
-        models[i].Draw(shader, 0, false); // no need to load texture!
-    }
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, prevFrameBuffer);
-    glViewport(0, 0, prevWidth, prevHeight);
-    glDisable(GL_CULL_FACE);
-}
-
-const mat4& UniShadow::getLightSpaceMatrix() const {
-    return lightSpace;
-}
-
-void OmniShadow::bindShadowMap(const GLuint index) const {
+void OmniShadow::BindShadowMap(GLuint index) const {
     glActiveTexture(index);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depth_map_);
 }
 
-float OmniShadow::getFrustumHeight() {
-    return frustumHeight;
-}
-
-void UniShadow::bindShadowMap(const GLuint index) const {
+void UniShadow::BindShadowMap(GLuint index) const {
     glActiveTexture(index);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glBindTexture(GL_TEXTURE_2D, depth_map_);
 }
+
+} /* namespace opengl */

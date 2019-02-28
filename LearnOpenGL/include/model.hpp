@@ -18,14 +18,9 @@
 
 namespace opengl {
 
-using std::string;
-using std::vector;
-
 class Model {
-    vector<Mesh> meshes_;
-    
-public:
-    Model(const string& obj_path, const string& tex_path = "");
+  public:
+    Model(const std::string& obj_path, const std::string& tex_path = "");
     
     void Draw(const Shader& shader,
               GLuint tex_offset = 0,
@@ -44,10 +39,13 @@ public:
             mesh.DrawInstanced(shader, amount, tex_offset, load_texture);
     }
         
-    void AppendData(const function<void ()>& func) const {
+    void AppendData(const std::function<void ()>& func) const {
         for (const auto& mesh : meshes_)
             mesh.AppendData(func);
     }
+    
+  private:
+    std::vector<Mesh> meshes_;
 };
 
 } /* namespace opengl */

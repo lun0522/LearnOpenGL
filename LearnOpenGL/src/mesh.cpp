@@ -8,10 +8,10 @@
 
 #include "mesh.hpp"
 
-namespace opengl {
+using namespace glm;
+using namespace std;
 
-using std::runtime_error;
-using std::to_string;
+namespace opengl {
 
 namespace {
 

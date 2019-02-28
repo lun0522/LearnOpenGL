@@ -181,23 +181,16 @@ void Render::renderLoop() {
     
     vector<OmniShadow> pointLightShadows;
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
-        pointLightShadows.
-        push_back(OmniShadow::PointLightShadow(path + "shaders/shader_omnishadow.vs",
-                                               path + "shaders/shader_omnishadow.gs",
-                                               path + "shaders/shader_omnishadow.fs"));
+        pointLightShadows.emplace_back(OmniShadow::PointLightShadow());
     }
     
     vec3 dirLight(1.0f, -1.0f, 1.0f);
     UniShadow dirLightShadow = UniShadow::
-    DirLightShadow(path + "shaders/shader_unishadow.vs",
-                   path + "shaders/shader_unishadow.fs",
-                   currentSize.width, currentSize.height);
-    dirLightShadow.moveLight(vec3(0.0f) - dirLight * 20.0f, dirLight);
+    DirLightShadow(currentSize.width, currentSize.height);
+    dirLightShadow.MoveLight(vec3(0.0f) - dirLight * 20.0f, dirLight);
     
     UniShadow spotLightShadow = UniShadow::
-    SpotLightShadow(path + "shaders/shader_unishadow.vs",
-                    path + "shaders/shader_unishadow.fs",
-                    currentSize.width, currentSize.height);
+    SpotLightShadow(currentSize.width, currentSize.height);
     
     
     // ------------------------------------
@@ -339,7 +332,7 @@ void Render::renderLoop() {
         vec3( 4.0f,  2.0f, -2.0f),
     };
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
-        pointLightShadows[i].moveLight(lampPos[i]);
+        pointLightShadows[i].MoveLight(lampPos[i]);
     
     vec3 lampColor[NUM_POINT_LIGHTS] = {
         vec3(1.0f, 0.0f, 0.0f),
@@ -352,7 +345,7 @@ void Render::renderLoop() {
     for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
         string index = std::to_string(i);
         objectShader.set_float("frustumHeights[" + index + "]",
-                              pointLightShadows[i].getFrustumHeight());
+                               pointLightShadows[i].frustum_height());
         objectShader.set_vec3("pointLightsPos[" + index + "]", lampPos[i]);
     }
     
@@ -475,26 +468,26 @@ void Render::renderLoop() {
         };
         
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
-            pointLightShadows[i].calcShadow(originalSize.width, originalSize.height,
+            pointLightShadows[i].CalculateShadow(originalSize.width, originalSize.height,
                                             framebuffer, models, modelMatrices);
-        dirLightShadow.calcShadow(originalSize.width, originalSize.height,
-                                  framebuffer, models, modelMatrices);
-        spotLightShadow.moveLight(camera.position(), camera.direction());
-        spotLightShadow.calcShadow(originalSize.width, originalSize.height,
-                                   framebuffer, models, modelMatrices);
+        dirLightShadow.CalculateShadow(originalSize.width, originalSize.height,
+                                       framebuffer, models, modelMatrices);
+        spotLightShadow.MoveLight(camera.position(), camera.direction());
+        spotLightShadow.CalculateShadow(originalSize.width, originalSize.height,
+                                        framebuffer, models, modelMatrices);
         
         glDisable(GL_CULL_FACE); // for explosion effect
         
         objectShader.Use();
         for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
-            pointLightShadows[i].bindShadowMap(GL_TEXTURE0 + i);
+            pointLightShadows[i].BindShadowMap(GL_TEXTURE0 + i);
             objectShader.set_int("pointLightDepthMaps[" + std::to_string(i) + "]", i);
         }
-        objectShader.set_mat4("dirLightSpace", dirLightShadow.getLightSpaceMatrix());
-        dirLightShadow.bindShadowMap(GL_TEXTURE3);
+        objectShader.set_mat4("dirLightSpace", dirLightShadow.light_space());
+        dirLightShadow.BindShadowMap(GL_TEXTURE3);
         objectShader.set_int("dirLightDepthMap", 3);
-        objectShader.set_mat4("spotLightSpace", spotLightShadow.getLightSpaceMatrix());
-        spotLightShadow.bindShadowMap(GL_TEXTURE4);
+        objectShader.set_mat4("spotLightSpace", spotLightShadow.light_space());
+        spotLightShadow.BindShadowMap(GL_TEXTURE4);
         objectShader.set_int("spotLightDepthMap", 4);
         
         glActiveTexture(GL_TEXTURE5);

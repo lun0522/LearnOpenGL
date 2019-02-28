@@ -9,15 +9,39 @@
 /* Begin PBXBuildFile section */
 		BD0117ED20842DF700069899 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD0117EB20842DF700069899 /* text.cpp */; };
 		BD34960721AF409700F4C000 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; };
-		BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; };
 		BD426EC120656C1600EE7ACA /* model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD426EC020656C1600EE7ACA /* model.cpp */; };
 		BD46AA81206FC6FD0042A0C0 /* loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD46AA7F206FC6FD0042A0C0 /* loader.cpp */; };
 		BD4F031F2053076200758FD3 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD4F031E2053076200758FD3 /* shader.cpp */; };
-		BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; };
+		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
 		BD5B70D42063F4C1001CFEF8 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD5B70D32063F4C1001CFEF8 /* mesh.cpp */; };
 		BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB12050659D00DA8EFF /* OpenGL.framework */; };
 		BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD7DDDBF20506B0300DA8EFF /* main.cpp */; };
+		BD7FB1322227B07900D495CE /* shader_lamp.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5C72073EC57004E7E1C /* shader_lamp.vs */; };
+		BD7FB1332227B07900D495CE /* shader_lamp.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5C82073EC58004E7E1C /* shader_lamp.fs */; };
+		BD7FB1342227B07900D495CE /* shader_glass.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD5E920B206DBADB00635CBC /* shader_glass.vs */; };
+		BD7FB1352227B07900D495CE /* shader_glass.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD5E920C206DBAE500635CBC /* shader_glass.fs */; };
+		BD7FB1362227B07900D495CE /* shader_object.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD617C81205BDC9200DBBAAA /* shader_object.vs */; };
+		BD7FB1372227B07900D495CE /* shader_object.gs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDE759B6207146C400FABBB5 /* shader_object.gs */; };
+		BD7FB1382227B07900D495CE /* shader_object.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD617C82205BDCA200DBBAAA /* shader_object.fs */; };
+		BD7FB1392227B07900D495CE /* shader_screen.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD349940206EA4F900429E58 /* shader_screen.vs */; };
+		BD7FB13A2227B07900D495CE /* shader_screen.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD349941206EA50100429E58 /* shader_screen.fs */; };
+		BD7FB13B2227B07900D495CE /* shader_hdr.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD09F3CC20F5CF590080BEA1 /* shader_hdr.fs */; };
+		BD7FB13C2227B07900D495CE /* shader_blend.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD180FB920F7068D00BA60F7 /* shader_blend.fs */; };
+		BD7FB13D2227B07900D495CE /* shader_gaussian.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD180FB820F6F64000BA60F7 /* shader_gaussian.fs */; };
+		BD7FB13E2227B07900D495CE /* shader_skybox.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD145FB9206F373B0068A587 /* shader_skybox.vs */; };
+		BD7FB13F2227B07900D495CE /* shader_skybox.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD145FBA206F37460068A587 /* shader_skybox.fs */; };
+		BD7FB1402227B07900D495CE /* shader_planet.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD3ED7CA207270960052CD5F /* shader_planet.vs */; };
+		BD7FB1412227B07900D495CE /* shader_planet.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD3ED7CB207270A00052CD5F /* shader_planet.fs */; };
+		BD7FB1422227B07900D495CE /* shader_asteroid.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD3ED7C8207267020052CD5F /* shader_asteroid.vs */; };
+		BD7FB1432227B07900D495CE /* shader_unishadow.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5C52073E6E0004E7E1C /* shader_unishadow.vs */; };
+		BD7FB1442227B07900D495CE /* shader_unishadow.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5C62073E6EA004E7E1C /* shader_unishadow.fs */; };
+		BD7FB1452227B07900D495CE /* shader_omnishadow.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5C92076AD0A004E7E1C /* shader_omnishadow.vs */; };
+		BD7FB1462227B07900D495CE /* shader_omnishadow.gs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5CA2076AD19004E7E1C /* shader_omnishadow.gs */; };
+		BD7FB1472227B07900D495CE /* shader_omnishadow.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB5A5CB2076AD29004E7E1C /* shader_omnishadow.fs */; };
+		BD7FB1482227B07900D495CE /* shader_text.vs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD0117E92084219600069899 /* shader_text.vs */; };
+		BD7FB1492227B07900D495CE /* shader_text.fs in Copy Files */ = {isa = PBXBuildFile; fileRef = BD0117EA2084219F00069899 /* shader_text.fs */; };
 		BD915570207866A600D7C7DF /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BD91556F207866A600D7C7DF /* glad.c */; };
 		BD9252502058B89100F6779C /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cpp */; };
 		BD9252532058C76500F6779C /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cpp */; };
@@ -31,8 +55,32 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 7;
 			files = (
+				BD7FB1322227B07900D495CE /* shader_lamp.vs in Copy Files */,
+				BD7FB1332227B07900D495CE /* shader_lamp.fs in Copy Files */,
+				BD7FB1342227B07900D495CE /* shader_glass.vs in Copy Files */,
+				BD7FB1352227B07900D495CE /* shader_glass.fs in Copy Files */,
+				BD7FB1362227B07900D495CE /* shader_object.vs in Copy Files */,
+				BD7FB1372227B07900D495CE /* shader_object.gs in Copy Files */,
+				BD7FB1382227B07900D495CE /* shader_object.fs in Copy Files */,
+				BD7FB1392227B07900D495CE /* shader_screen.vs in Copy Files */,
+				BD7FB13A2227B07900D495CE /* shader_screen.fs in Copy Files */,
+				BD7FB13B2227B07900D495CE /* shader_hdr.fs in Copy Files */,
+				BD7FB13C2227B07900D495CE /* shader_blend.fs in Copy Files */,
+				BD7FB13D2227B07900D495CE /* shader_gaussian.fs in Copy Files */,
+				BD7FB13E2227B07900D495CE /* shader_skybox.vs in Copy Files */,
+				BD7FB13F2227B07900D495CE /* shader_skybox.fs in Copy Files */,
+				BD7FB1402227B07900D495CE /* shader_planet.vs in Copy Files */,
+				BD7FB1412227B07900D495CE /* shader_planet.fs in Copy Files */,
+				BD7FB1422227B07900D495CE /* shader_asteroid.vs in Copy Files */,
+				BD7FB1432227B07900D495CE /* shader_unishadow.vs in Copy Files */,
+				BD7FB1442227B07900D495CE /* shader_unishadow.fs in Copy Files */,
+				BD7FB1452227B07900D495CE /* shader_omnishadow.vs in Copy Files */,
+				BD7FB1462227B07900D495CE /* shader_omnishadow.gs in Copy Files */,
+				BD7FB1472227B07900D495CE /* shader_omnishadow.fs in Copy Files */,
+				BD7FB1482227B07900D495CE /* shader_text.vs in Copy Files */,
+				BD7FB1492227B07900D495CE /* shader_text.fs in Copy Files */,
 				BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */,
 				BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */,
 				BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */,

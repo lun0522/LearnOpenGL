@@ -19,12 +19,6 @@
 
 namespace opengl {
 
-using glm::vec2;
-using glm::vec3;
-using std::function;
-using std::string;
-using std::vector;
-
 enum class TextureType {
     kDiffuse, kSpecular, kReflection,
 };
@@ -35,21 +29,16 @@ struct Texture {
 };
 
 struct Vertex {
-    vec3 position;
-    vec3 normal;
-    vec2 tex_coord;
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 tex_coord;
 };
 
 class Mesh {
-    GLuint vao_, vbo_, ebo_;
-    const vector<Vertex> vertices_;
-    const vector<GLuint> indices_;
-    const vector<Texture> textures_;
-    
-public:
-    Mesh(const vector<Vertex>& vertices,
-         const vector<GLuint>& indices,
-         const vector<Texture>& textures);
+  public:
+    Mesh(const std::vector<Vertex>& vertices,
+         const std::vector<GLuint>& indices,
+         const std::vector<Texture>& textures);
     void Draw(const Shader& shader,
               GLuint tex_offset,
               bool load_texture) const;
@@ -57,7 +46,13 @@ public:
                        GLuint amount,
                        GLuint tex_offset,
                        bool load_texture) const;
-    void AppendData(const function<void ()>& func) const;
+    void AppendData(const std::function<void ()>& func) const;
+    
+  private:
+    GLuint vao_, vbo_, ebo_;
+    const std::vector<Vertex> vertices_;
+    const std::vector<GLuint> indices_;
+    const std::vector<Texture> textures_;
 };
 
 } /* opengl */

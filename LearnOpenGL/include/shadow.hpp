@@ -17,83 +17,76 @@
 #include "shader.hpp"
 #include "model.hpp"
 
-using namespace opengl; // TODO: remove
+namespace opengl {
 
 class Shadow {
-    Shadow();
-protected:
-    GLuint FBO;
-    GLuint depthMap;
-    float width, height;
-    Shader shader;
-    glm::mat4 projection;
-    Shadow(const int width,
-           const int height,
+  public:
+    void CalculateShadow(int prev_width,
+                         int prev_height,
+                         GLuint prev_frameBuffer,
+                         const std::vector<Model>& models,
+                         const std::vector<glm::mat4>& model_matrices) const;
+    
+  protected:
+    GLuint fbo_;
+    GLuint depth_map_;
+    int width_, height_;
+    Shader shader_;
+    glm::mat4 proj_;
+    
+    Shadow(int width,
+           int height,
            const glm::mat4& projection,
            const Shader& shader);
-    virtual void createDepthMap() = 0;
-    virtual void bindShadowMap(const GLuint index) const = 0;
-public:
-    void calcShadow(const int prevWidth,
-                    const int prevHeight,
-                    const GLuint prevFrameBuffer,
-                    const std::vector<Model>& models,
-                    const std::vector<glm::mat4>& modelMatrices) const;
+    virtual void CreateDepthMap() = 0;
+    virtual void BindShadowMap(GLuint index) const = 0;
 };
 
 class OmniShadow : public Shadow {
-    float frustumHeight;
-    std::vector<std::string> uniformNames;
-    OmniShadow();
-    OmniShadow(const float frustumHeight,
-               const glm::mat4& projection,
-               const std::string& vertPath,
-               const std::string& geomPath,
-               const std::string& fragPath);
-    void createDepthMap();
-public:
-    static OmniShadow PointLightShadow(const std::string& vertPath,
-                                       const std::string& geomPath,
-                                       const std::string& fragPath,
-                                       const float near = 0.1f,
-                                       const float far = 100.0f);
-    void moveLight(const glm::vec3& position);
-    void bindShadowMap(const GLuint index) const;
-    float getFrustumHeight();
+  public:
+    static OmniShadow PointLightShadow(float near = 0.1f,
+                                       float far = 100.0f);
+    void MoveLight(const glm::vec3& position);
+    void BindShadowMap(GLuint index) const;
+    float frustum_height() const { return frustum_height_; }
+    
+  private:
+    float frustum_height_;
+    std::vector<std::string> uniform_names_;
+    OmniShadow(float frustum_height,
+               const glm::mat4& projection);
+    void CreateDepthMap();
 };
 
 class UniShadow : public Shadow {
-    glm::mat4 lightSpace;
-    UniShadow();
-    UniShadow(const int width,
-              const int height,
-              const glm::mat4& projection,
-              const std::string& vertPath,
-              const std::string& fragPath);
-    void createDepthMap();
-public:
-    static UniShadow DirLightShadow(const std::string& vertPath,
-                                    const std::string& fragPath,
-                                    const int width,
-                                    const int height,
-                                    const float left = -10.0f,
-                                    const float right = 10.0f,
-                                    const float bottom = -10.0f,
-                                    const float top = 10.0f,
-                                    const float near = 0.1f,
-                                    const float far = 100.0f);
-    static UniShadow SpotLightShadow(const std::string& vertPath,
-                                     const std::string& fragPath,
-                                     const int width,
-                                     const int height,
-                                     const float fov = 45.0f,
-                                     const float near = 0.1f,
-                                     const float far = 50.0f);
-    void moveLight(const glm::vec3& position,
+  public:
+    static UniShadow DirLightShadow(int width,
+                                    int height,
+                                    float left = -10.0f,
+                                    float right = 10.0f,
+                                    float bottom = -10.0f,
+                                    float top = 10.0f,
+                                    float near = 0.1f,
+                                    float far = 100.0f);
+    static UniShadow SpotLightShadow(int width,
+                                     int height,
+                                     float fov = 45.0f,
+                                     float near = 0.1f,
+                                     float far = 50.0f);
+    void MoveLight(const glm::vec3& position,
                    const glm::vec3& front,
-                   const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
-    const glm::mat4& getLightSpaceMatrix() const;
-    void bindShadowMap(const GLuint index) const;
+                   const glm::vec3& up = {0.0f, 1.0f, 0.0f});
+    void BindShadowMap(GLuint index) const;
+    const glm::mat4& light_space() const { return light_space_; }
+    
+  private:
+    glm::mat4 light_space_;
+    UniShadow(int width,
+              int height,
+              const glm::mat4& projection);
+    void CreateDepthMap();
 };
+
+} /* namespace opengl */
 
 #endif /* shadow_hpp */
