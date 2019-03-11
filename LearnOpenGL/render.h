@@ -1,5 +1,5 @@
 //
-//  render.hpp
+//  render.h
 //  LearnOpenGL
 //
 //  Created by Pujun Lun on 3/13/18.
@@ -13,11 +13,13 @@
 #include <GLFW/glfw3.h>
 
 class Render {
-    GLFWwindow *window;
-    void processKeyboardInput();
-public:
-    Render();
-    void renderLoop();
+ public:
+  Render();
+  void MainLoop();
+
+ private:
+  GLFWwindow* window_;
+  void ProcessKeyboardInput();
 };
 
 #endif /* render_hpp */
