@@ -73,8 +73,8 @@ void Render::ProcessKeyboardInput() {
   lastFrame = currentFrame;
 
   if (glfwGetKey(window_, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(window_, true);
-      return;
+    glfwSetWindowShouldClose(window_, true);
+    return;
   }
 
   float distance = deltaTime * 5.0f;

@@ -9,12 +9,11 @@
 /* Begin PBXBuildFile section */
 		BD0117ED20842DF700069899 /* text.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD0117EB20842DF700069899 /* text.cc */; };
 		BD34960721AF409700F4C000 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; };
-		BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD34960621AF409700F4C000 /* libglfw.3.3.dylib */; };
 		BD426EC120656C1600EE7ACA /* model.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD426EC020656C1600EE7ACA /* model.cc */; };
 		BD46AA81206FC6FD0042A0C0 /* loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD46AA7F206FC6FD0042A0C0 /* loader.cc */; };
 		BD4F031F2053076200758FD3 /* shader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD4F031E2053076200758FD3 /* shader.cc */; };
-		BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
 		BD5B70D42063F4C1001CFEF8 /* mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD5B70D32063F4C1001CFEF8 /* mesh.cc */; };
 		BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD7DDDB12050659D00DA8EFF /* OpenGL.framework */; };
 		BD7DDDC620506B0300DA8EFF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD7DDDBF20506B0300DA8EFF /* main.cpp */; };
@@ -46,7 +45,8 @@
 		BD9252502058B89100F6779C /* camera.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cc */; };
 		BD9252532058C76500F6779C /* render.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cc */; };
 		BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
-		BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD50D0402082436A004F2734 /* libfreetype.6.dylib */; };
+		BDB23CE3225ADD7900816998 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */; };
+		BDB23CE4225ADE8F00816998 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		BDB5A5C42073D71F004E7E1C /* shadow.cc in Sources */ = {isa = PBXBuildFile; fileRef = BDB5A5C22073D71F004E7E1C /* shadow.cc */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +57,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				BDB23CE4225ADE8F00816998 /* libfreetype.6.dylib in Copy Files */,
 				BD7FB1322227B07900D495CE /* shader_lamp.vs in Copy Files */,
 				BD7FB1332227B07900D495CE /* shader_lamp.fs in Copy Files */,
 				BD7FB1342227B07900D495CE /* shader_glass.vs in Copy Files */,
@@ -82,7 +83,6 @@
 				BD7FB1482227B07900D495CE /* shader_text.vs in Copy Files */,
 				BD7FB1492227B07900D495CE /* shader_text.fs in Copy Files */,
 				BD34960821AF40A300F4C000 /* libglfw.3.3.dylib in Copy Files */,
-				BD50D04220824374004F2734 /* libfreetype.6.dylib in Copy Files */,
 				BD50D04320824374004F2734 /* libassimp.4.1.0.dylib in Copy Files */,
 			);
 			name = "Copy Files";
@@ -130,6 +130,7 @@
 		BD92524F2058B89100F6779C /* camera.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cc; sourceTree = "<group>"; };
 		BD9252512058C6A300F6779C /* render.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		BD9252522058C76500F6779C /* render.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cc; sourceTree = "<group>"; };
+		BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../usr/local/Cellar/freetype/2.10.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		BDB5A5C22073D71F004E7E1C /* shadow.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shadow.cc; sourceTree = "<group>"; };
 		BDB5A5C32073D71F004E7E1C /* shadow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shadow.h; sourceTree = "<group>"; };
 		BDB5A5C52073E6E0004E7E1C /* shader_unishadow.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_unishadow.vs; sourceTree = "<group>"; };
@@ -147,9 +148,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDB23CE3225ADD7900816998 /* libfreetype.6.dylib in Frameworks */,
 				BD34960721AF409700F4C000 /* libglfw.3.3.dylib in Frameworks */,
 				BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */,
-				BDA56D7F21ADA0F700A4B992 /* libfreetype.6.dylib in Frameworks */,
 				BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -211,6 +212,7 @@
 		BD7DDDB02050659D00DA8EFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */,
 				BD34960621AF409700F4C000 /* libglfw.3.3.dylib */,
 				BD50D0402082436A004F2734 /* libfreetype.6.dylib */,
 				BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */,
@@ -491,11 +493,11 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
-					/usr/local/Cellar/freetype/2.9/lib,
 					"/usr/local/Cellar/glfw/HEAD-bb2ca1d/lib",
+					/usr/local/Cellar/freetype/2.10.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
+				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.10.0/include/freetype2";
 			};
 			name = Debug;
 		};
@@ -509,11 +511,11 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
-					/usr/local/Cellar/freetype/2.9/lib,
 					"/usr/local/Cellar/glfw/HEAD-bb2ca1d/lib",
+					/usr/local/Cellar/freetype/2.10.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.9/include/freetype2";
+				SYSTEM_HEADER_SEARCH_PATHS = "/Users/lun/Desktop/Code/libs /Users/lun/Desktop/Code/libs/glad/include /usr/local/include /usr/local/Cellar/freetype/2.10.0/include/freetype2";
 			};
 			name = Release;
 		};
