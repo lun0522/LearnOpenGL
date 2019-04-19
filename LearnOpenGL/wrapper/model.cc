@@ -43,15 +43,15 @@ Mesh ProcessMesh(const string& directory,
   vector<Vertex> vertices(mesh->mNumVertices);
   aiVector3D* ai_tex_coords = mesh->mTextureCoords[0];
   for (int i = 0; i < vertices.size(); ++i) {
-      vec3 position{mesh->mVertices[i].x,
-                    mesh->mVertices[i].y,
-                    mesh->mVertices[i].z};
-      vec3 normal{mesh->mNormals[i].x,
-                  mesh->mNormals[i].y,
-                  mesh->mNormals[i].z};
-      glm::vec2 tex_coord{ai_tex_coords ? ai_tex_coords[i].x : 0.0,
-                          ai_tex_coords ? ai_tex_coords[i].y : 0.0};
-      vertices[i] = Vertex{position, normal, tex_coord};
+    vec3 position{mesh->mVertices[i].x,
+                  mesh->mVertices[i].y,
+                  mesh->mVertices[i].z};
+    vec3 normal{mesh->mNormals[i].x,
+                mesh->mNormals[i].y,
+                mesh->mNormals[i].z};
+    glm::vec2 tex_coord{ai_tex_coords ? ai_tex_coords[i].x : 0.0,
+                        ai_tex_coords ? ai_tex_coords[i].y : 0.0};
+    vertices[i] = Vertex{position, normal, tex_coord};
   }
 
   // load indices
