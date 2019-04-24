@@ -42,12 +42,11 @@
 		BD915570207866A600D7C7DF /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = BD91556F207866A600D7C7DF /* glad.c */; };
 		BD9252502058B89100F6779C /* camera.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD92524F2058B89100F6779C /* camera.cc */; };
 		BD9252532058C76500F6779C /* render.cc in Sources */ = {isa = PBXBuildFile; fileRef = BD9252522058C76500F6779C /* render.cc */; };
-		BD9D3CF5226978FB00F4D170 /* libglfw.3.4.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BD9D3CF4226978FB00F4D170 /* libglfw.3.4.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		BD9D3CF6226979C200F4D170 /* libglfw.3.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9D3CF4226978FB00F4D170 /* libglfw.3.4.dylib */; };
 		BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */; };
 		BDB23CE3225ADD7900816998 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */; };
 		BDB23CE4225ADE8F00816998 /* libfreetype.6.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		BDB5A5C42073D71F004E7E1C /* shadow.cc in Sources */ = {isa = PBXBuildFile; fileRef = BDB5A5C22073D71F004E7E1C /* shadow.cc */; };
+		BDD09AF7226ABACB003601DA /* libglfw.3.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BDD09AF6226ABACB003601DA /* libglfw.3.4.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +56,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				BD9D3CF5226978FB00F4D170 /* libglfw.3.4.dylib in Copy Files */,
 				BDB23CE4225ADE8F00816998 /* libfreetype.6.dylib in Copy Files */,
 				BD7FB1322227B07900D495CE /* shader_lamp.vs in Copy Files */,
 				BD7FB1332227B07900D495CE /* shader_lamp.fs in Copy Files */,
@@ -128,8 +126,6 @@
 		BD92524F2058B89100F6779C /* camera.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cc; sourceTree = "<group>"; };
 		BD9252512058C6A300F6779C /* render.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		BD9252522058C76500F6779C /* render.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = render.cc; sourceTree = "<group>"; };
-		BD9D3CF4226978FB00F4D170 /* libglfw.3.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.4.dylib; path = "../../../../../usr/local/Cellar/glfw/HEAD-a337c56/lib/libglfw.3.4.dylib"; sourceTree = "<group>"; };
-		BD9D3CF7226997D700F4D170 /* libglfw.3.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libglfw.3.4.dylib; sourceTree = "<group>"; };
 		BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../usr/local/Cellar/freetype/2.10.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		BDB5A5C22073D71F004E7E1C /* shadow.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shadow.cc; sourceTree = "<group>"; };
 		BDB5A5C32073D71F004E7E1C /* shadow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shadow.h; sourceTree = "<group>"; };
@@ -140,6 +136,7 @@
 		BDB5A5C92076AD0A004E7E1C /* shader_omnishadow.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.vs; sourceTree = "<group>"; };
 		BDB5A5CA2076AD19004E7E1C /* shader_omnishadow.gs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.gs; sourceTree = "<group>"; };
 		BDB5A5CB2076AD29004E7E1C /* shader_omnishadow.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_omnishadow.fs; sourceTree = "<group>"; };
+		BDD09AF6226ABACB003601DA /* libglfw.3.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.4.dylib; path = "../../../../../usr/local/Cellar/glfw/HEAD-a337c56/lib/libglfw.3.4.dylib"; sourceTree = "<group>"; };
 		BDE759B6207146C400FABBB5 /* shader_object.gs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader_object.gs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -148,7 +145,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BD9D3CF6226979C200F4D170 /* libglfw.3.4.dylib in Frameworks */,
+				BDD09AF7226ABACB003601DA /* libglfw.3.4.dylib in Frameworks */,
 				BDB23CE3225ADD7900816998 /* libfreetype.6.dylib in Frameworks */,
 				BDA56D7E21ADA0F700A4B992 /* libassimp.4.1.0.dylib in Frameworks */,
 				BD7DDDB22050659D00DA8EFF /* OpenGL.framework in Frameworks */,
@@ -182,7 +179,6 @@
 		BD7DDD9D20505BC600DA8EFF = {
 			isa = PBXGroup;
 			children = (
-				BD9D3CF4226978FB00F4D170 /* libglfw.3.4.dylib */,
 				BD7DDDA820505BC700DA8EFF /* LearnOpenGL */,
 				BD7DDDA720505BC700DA8EFF /* Products */,
 				BD7DDDB02050659D00DA8EFF /* Frameworks */,
@@ -213,7 +209,7 @@
 		BD7DDDB02050659D00DA8EFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BD9D3CF7226997D700F4D170 /* libglfw.3.4.dylib */,
+				BDD09AF6226ABACB003601DA /* libglfw.3.4.dylib */,
 				BDB23CE2225ADD7900816998 /* libfreetype.6.dylib */,
 				BD9042722065C7EE00827029 /* libassimp.4.1.0.dylib */,
 				BD7DDDB12050659D00DA8EFF /* OpenGL.framework */,
